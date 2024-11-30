@@ -6,7 +6,6 @@
       "program": "${file}",
       "request": "launch",
       "type": "node"
-    },
-    {}
+    }
   ]
 }

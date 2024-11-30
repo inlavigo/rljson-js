@@ -1,10 +1,10 @@
 {
   "name": "rljson",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "main": "dist/rljson.js",
   "types": "dist/rljson.d.ts",
   "scripts": {
-    "test": "vitest --run"
+    "test": "vitest --run --coverage"
   },
   "type": "module",
   "keywords": [],
@@ -31,6 +31,6 @@
     "vitest": "^2.1.6"
   },
   "dependencies": {
-    "gg-json-hash": "^2.0.2"
+    "gg-json-hash": "^2.1.2"
   }
 }

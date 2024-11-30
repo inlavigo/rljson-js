@@ -4,7 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import { JsonHash, addHashes } from 'gg-json-hash';
+import { JsonHash } from 'gg-json-hash';
 
 /**
  * A simple json map
@@ -44,6 +44,8 @@ export class Rljson {
      */
     this.data = data;
   }
+
+  jsonJash = JsonHash.default;
 
   /**
    * Creates an Rljson instance from JSON data.
@@ -87,10 +89,10 @@ export class Rljson {
     this._checkTableNames(addedData);
 
     if (validateHashes) {
-      new JsonHash().validate(addedData);
+      this.jsonJash.validate(addedData);
     }
 
-    addedData = addHashes(addedData);
+    addedData = this.jsonJash.apply(addedData);
     const addedDataAsMap = this._toMap(addedData);
 
     if (Object.keys(this.originalData).length === 0) {
@@ -339,101 +341,125 @@ export class Rljson {
    * An example object
    * @type {Rljson}
    */
-  static example = Rljson.fromJson({
-    '@tableA': {
-      _data: [
-        {
-          keyA0: 'a0',
-        },
-        {
-          keyA1: 'a1',
-        },
-      ],
-    },
-    '@tableB': {
-      _data: [
-        {
-          keyB0: 'b0',
-        },
-        {
-          keyB1: 'b1',
-        },
-      ],
-    },
-  });
+  static get example() {
+    return Rljson.fromJson({
+      '@tableA': {
+        _data: [
+          {
+            keyA0: 'a0',
+          },
+          {
+            keyA1: 'a1',
+          },
+        ],
+      },
+      '@tableB': {
+        _data: [
+          {
+            keyB0: 'b0',
+          },
+          {
+            keyB1: 'b1',
+          },
+        ],
+      },
+    });
+  }
 
   // ...........................................................................
   /**
    * An example object
    * @type {Rljson}
    */
-  static exampleWithLink = Rljson.fromJson({
-    '@tableA': {
-      _data: [
-        {
-          keyA0: 'a0',
-        },
-        {
-          keyA1: 'a1',
-        },
-      ],
-    },
-    '@linkToTableA': {
-      _data: [
-        {
-          '@tableA': 'KFQrf4mEz0UPmUaFHwH4T6',
-        },
-      ],
-    },
-  });
+  static get exampleWithLink() {
+    return Rljson.fromJson({
+      '@tableA': {
+        _data: [
+          {
+            keyA0: 'a0',
+          },
+          {
+            keyA1: 'a1',
+          },
+        ],
+      },
+      '@linkToTableA': {
+        _data: [
+          {
+            '@tableA': 'KFQrf4mEz0UPmUaFHwH4T6',
+          },
+        ],
+      },
+    });
+  }
 
   // ...........................................................................
   /**
    * An example object
    * @type {Rljson}
    */
-  static exampleWithDeepLink = Rljson.fromJson({
-    '@a': {
-      _data: [
-        {
-          '@b': 'Ji-ftHLbqQehV4aV0FlEO6',
-          value: 'a',
-          _hash: 'Q-oaM7xctsuFg_faf1lkhC',
-        },
-      ],
-      _hash: 'GnSVp1CmoAo3rPiiGl44p-',
-    },
-    '@b': {
-      _data: [
-        {
-          '@c': 'tlmxwmwJvFMyBYIYoA2k4K',
-          value: 'b',
-          _hash: 'ks2Zy5nlXx91deccdZtjvK',
-        },
-      ],
-      _hash: 'uHEtXhILctvNH6zk6k4vDi',
-    },
-    '@c': {
-      _data: [
-        {
-          '@d': '0tlKQklLrHoIhHZxdtcbmS',
-          value: 'c',
-          _hash: '3AzQ8kTQ-PjmW0FwY5mirx',
-        },
-      ],
-      _hash: 'PE0bzvER5q3D-DgxswKzQM',
-    },
-    '@d': {
-      _data: [
-        {
-          value: 'd',
-          _hash: '0tlKQklLrHoIhHZxdtcbmS',
-        },
-      ],
-      _hash: 'WNq8zriiKUM_vn9DwrwAf0',
-    },
-    _hash: '8_qxUEjOkDIq8Um7Z8OCt6',
-  });
+  static get exampleWithDeepLink() {
+    // Create an Rljson instance
+    let rljson = Rljson.fromJson({});
+
+    // Create a table d
+    rljson = rljson.addData({
+      '@d': {
+        _data: [
+          {
+            value: 'd',
+          },
+        ],
+      },
+    });
+
+    // Get the hash of d
+    const hashD = rljson.hash({ table: '@d', index: 0 });
+
+    // Create a second table c linking to d
+    rljson = rljson.addData({
+      '@c': {
+        _data: [
+          {
+            '@d': hashD,
+            value: 'c',
+          },
+        ],
+      },
+    });
+
+    // Get the hash of c
+    const hashC = rljson.hash({ table: '@c', index: 0 });
+
+    // Create a third table b linking to c
+    rljson = rljson.addData({
+      '@b': {
+        _data: [
+          {
+            '@c': hashC,
+            value: 'b',
+          },
+        ],
+      },
+    });
+
+    // Get the hash of b
+    const hashB = rljson.hash({ table: '@b', index: 0 });
+
+    // Create a first table a linking to b
+    rljson = rljson.addData({
+      '@a': {
+        _data: [
+          {
+            '@b': hashB,
+            value: 'a',
+          },
+        ],
+      },
+    });
+
+    return rljson;
+  }
 
   // ######################
   // Private

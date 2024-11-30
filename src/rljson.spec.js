@@ -10,7 +10,8 @@ import { assert } from 'console';
 import { Rljson } from './rljson.js';
 
 suite('Rljson', () => {
-  let rljson = Rljson.example;
+  /** @type Rljson */
+  let rljson;
   /**
    * @type {string}
    */
