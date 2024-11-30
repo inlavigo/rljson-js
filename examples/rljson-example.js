@@ -4,8 +4,10 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import { addHashes } from 'gg-json-hash';
-import { Rljson } from 'rljson.js';
+import { JsonHash } from 'gg-json-hash';
+import { Rljson } from '../src/rljson.js';
+
+const jh = JsonHash.default;
 
 // .............................................................
 console.log('Create tables');
@@ -102,7 +104,7 @@ console.log(a); // a
 
 // .............................................................
 console.log('To hash data in advance use gg_json_hash');
-const hashedData = addHashes({
+const hashedData = jh.apply({
   '@tableA': {
     _data: [{ a: 'a0' }, { a: 'a1' }],
   },

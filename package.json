@@ -1,6 +1,6 @@
 {
   "name": "rljson",
-  "version": "2.0.3",
+  "version": "2.0.5",
   "main": "dist/rljson.js",
   "types": "dist/rljson.d.ts",
   "scripts": {

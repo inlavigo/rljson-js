@@ -280,7 +280,8 @@ suite('Rljson', () => {
 
         try {
           rljson.addData({
-            tableA: { _data: [] },
+            _hash: 'xyz',
+            tableA: { _hash: 'hash', _data: [] },
             tableB: { _data: [] },
             tableC: { _data: [] },
           });

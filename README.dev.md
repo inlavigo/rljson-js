@@ -12,6 +12,12 @@ npx tsc
 npm test
 ```
 
+## Run example
+
+```bash
+node examples/rljson-example.js
+```
+
 ## Publish npm
 
 ```bash
