@@ -1,7 +1,9 @@
 import { defineConfig } from 'vite';
+import eslintPlugin from 'vite-plugin-eslint';
 import { configDefaults } from 'vitest/config';
 
 export default defineConfig({
+  plugins: [eslintPlugin()],
   test: {
     globals: true, // Wenn du globale Funktionen wie "describe" und "it" verwenden möchtest
     environment: 'jsdom', // Standardumgebung für Tests

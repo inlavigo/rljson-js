@@ -1,20 +1,18 @@
 import pluginJs from '@eslint/js';
-import jest from 'eslint-plugin-jest';
 import jsdoc from 'eslint-plugin-jsdoc';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
+// import eslintPlugin from 'vite-plugin-eslint';
 
 /** @type {import('eslint').Linter.Config[]} */
 export default [
   { files: ['**/*.{js,mjs,cjs}'] },
-  { languageOptions: { globals: { ...globals.browser, ...globals.jest } } },
+  { languageOptions: { globals: { ...globals.browser } } },
   pluginJs.configs.recommended,
 
   {
-    plugins: { jsdoc, jest },
+    plugins: { jsdoc },
     rules: {
-      ...jest.configs.recommended.rules,
-
       'no-unused-vars': 'error',
       'no-undef': 'error',
       'no-shadow': 'error',
@@ -46,11 +44,8 @@ export default [
         },
       ],
 
-      // Jest rules
+      // Typescript rules
       ...tseslint.configs.recommended.rules,
-      'jest/prefer-expect-assertions': 'off',
-      'jest/prefer-lowercase-title': 'off',
-      'jest/no-hooks': 'off',
     },
   },
   {

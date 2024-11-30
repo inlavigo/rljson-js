@@ -4,10 +4,12 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import { beforeEach, expect, suite, test } from 'vitest';
+
 import { assert } from 'console';
 import { Rljson } from './rljson.js';
 
-describe('Rljson', () => {
+suite('Rljson', () => {
   let rljson = Rljson.example;
   /**
    * @type {string}
@@ -39,8 +41,8 @@ describe('Rljson', () => {
     assert(b1Hash.length === 22);
   });
 
-  describe('ls()', () => {
-    it('lists the paths of all items', () => {
+  suite('ls()', () => {
+    test('lists the paths of all items', () => {
       expect(rljson.ls()).toEqual([
         '@tableA/KFQrf4mEz0UPmUaFHwH4T6/keyA0',
         '@tableA/YPw-pxhqaUOWRFGramr4B1/keyA1',
@@ -50,8 +52,8 @@ describe('Rljson', () => {
     });
   });
 
-  describe('fromData(data)', () => {
-    it('adds hashes to all fields', () => {
+  suite('fromData(data)', () => {
+    test('adds hashes to all fields', () => {
       expect(rljson.data).toEqual({
         '@tableA': {
           [a0Hash]: {
@@ -77,9 +79,9 @@ describe('Rljson', () => {
     });
   });
 
-  describe('table(String table)', () => {
-    describe('returns', () => {
-      it('the table when existing', () => {
+  suite('table(String table)', () => {
+    suite('returns', () => {
+      test('the table when existing', () => {
         const table = rljson.table('@tableA');
         expect(table).toEqual({
           [a0Hash]: {
@@ -94,8 +96,8 @@ describe('Rljson', () => {
       });
     });
 
-    describe('throws', () => {
-      it('when table does not exist', () => {
+    suite('throws', () => {
+      test('when table does not exist', () => {
         let exception;
 
         try {
@@ -109,8 +111,8 @@ describe('Rljson', () => {
     });
   });
 
-  describe('items(table, where)', () => {
-    it('returns the items that match the query', () => {
+  suite('items(table, where)', () => {
+    test('returns the items that match the query', () => {
       const items = rljson.items({
         table: '@tableA',
         where: (item) => item['keyA0'] === 'a0',
@@ -120,9 +122,9 @@ describe('Rljson', () => {
     });
   });
 
-  describe('item(table, hash)', () => {
-    describe('returns', () => {
-      it('the item when existing', () => {
+  suite('item(table, hash)', () => {
+    suite('returns', () => {
+      test('the item when existing', () => {
         const item = rljson.item('@tableA', a0Hash);
         expect(item).toEqual({
           keyA0: 'a0',
@@ -131,8 +133,8 @@ describe('Rljson', () => {
       });
     });
 
-    describe('throws', () => {
-      it('when table is not available', () => {
+    suite('throws', () => {
+      test('when table is not available', () => {
         let exception;
 
         try {
@@ -144,7 +146,7 @@ describe('Rljson', () => {
         expect(exception.toString()).toBe('Error: Table not found: @tableC');
       });
 
-      it('when hash is not available', () => {
+      test('when hash is not available', () => {
         let exception;
 
         try {
@@ -160,9 +162,9 @@ describe('Rljson', () => {
     });
   });
 
-  describe('value(table, hash, key, key2, key3, key4 followLinks)', () => {
-    describe('returns', () => {
-      it('the value of the key of the item with hash in table', () => {
+  suite('value(table, hash, key, key2, key3, key4 followLinks)', () => {
+    suite('returns', () => {
+      test('the value of the key of the item with hash in table', () => {
         expect(
           rljson.get({
             table: '@tableA',
@@ -172,14 +174,14 @@ describe('Rljson', () => {
         ).toBe('a0');
       });
 
-      it('the complete item, when no key is given', () => {
+      test('the complete item, when no key is given', () => {
         expect(rljson.get({ table: '@tableA', item: a0Hash })).toEqual({
           keyA0: 'a0',
           _hash: a0Hash,
         });
       });
 
-      it('the linked value, when property is a link', () => {
+      test('the linked value, when property is a link', () => {
         rljson = Rljson.exampleWithLink;
 
         const tableALinkHash = rljson.hash({
@@ -196,7 +198,7 @@ describe('Rljson', () => {
         ).toEqual({ _hash: a0Hash, keyA0: 'a0' });
       });
 
-      it('the linked value across multiple tables using key2 to key4', () => {
+      test('the linked value across multiple tables using key2 to key4', () => {
         rljson = Rljson.exampleWithDeepLink;
         expect(
           rljson.get({
@@ -211,8 +213,8 @@ describe('Rljson', () => {
       });
     });
 
-    describe('throws', () => {
-      it('when key does not point to a valid value', () => {
+    suite('throws', () => {
+      test('when key does not point to a valid value', () => {
         let exception;
 
         try {
@@ -230,7 +232,7 @@ describe('Rljson', () => {
         );
       });
 
-      it('when a second key is given but the first key is not a link', () => {
+      test('when a second key is given but the first key is not a link', () => {
         let exception;
 
         try {
@@ -251,9 +253,9 @@ describe('Rljson', () => {
     });
   });
 
-  describe('addData(data)', () => {
-    describe('throws', () => {
-      it('when validateHashes is true and hashes are missing', () => {
+  suite('addData(data)', () => {
+    suite('throws', () => {
+      test('when validateHashes is true and hashes are missing', () => {
         let exception;
 
         try {
@@ -272,7 +274,7 @@ describe('Rljson', () => {
         expect(exception.toString()).toBe('Error: Hash is missing.');
       });
 
-      it('when table names do not start with @', () => {
+      test('when table names do not start with @', () => {
         let exception;
 
         try {
@@ -290,7 +292,7 @@ describe('Rljson', () => {
         );
       });
 
-      it('when tables do not contain a _data object', () => {
+      test('when tables do not contain a _data object', () => {
         let exception;
 
         try {
@@ -307,7 +309,7 @@ describe('Rljson', () => {
         );
       });
 
-      it('when tables do not contain a _data that is not a list', () => {
+      test('when tables do not contain a _data that is not a list', () => {
         let exception;
 
         try {
@@ -329,7 +331,7 @@ describe('Rljson', () => {
       });
     });
 
-    it('adds data to the json', () => {
+    test('adds data to the json', () => {
       const rljson2 = rljson.addData({
         '@tableA': {
           _data: [{ keyA2: 'a2' }],
@@ -344,7 +346,7 @@ describe('Rljson', () => {
       ]);
     });
 
-    it('replaces data when the added table is not yet existing', () => {
+    test('replaces data when the added table is not yet existing', () => {
       const rljson2 = rljson.addData({
         '@tableC': {
           _data: [{ keyC0: 'c0' }],
@@ -361,7 +363,7 @@ describe('Rljson', () => {
       ]);
     });
 
-    it('does not cause duplicates', () => {
+    test('does not cause duplicates', () => {
       const rljson2 = rljson.addData({
         '@tableA': {
           _data: [{ keyA1: 'a1' }],
@@ -376,14 +378,14 @@ describe('Rljson', () => {
     });
   });
 
-  describe('checkLinks()', () => {
-    it('does nothing when all links are ok', () => {
+  suite('checkLinks()', () => {
+    test('does nothing when all links are ok', () => {
       rljson = Rljson.exampleWithLink;
       expect(() => rljson.checkLinks()).not.toThrow();
     });
 
-    describe('throws', () => {
-      it('when the table of a link does not exist', () => {
+    suite('throws', () => {
+      test('when the table of a link does not exist', () => {
         rljson = Rljson.exampleWithLink;
 
         const jsonWithBrokenLink = rljson.addData({
@@ -411,7 +413,7 @@ describe('Rljson', () => {
         );
       });
 
-      it('when linked item does not exist', () => {
+      test('when linked item does not exist', () => {
         rljson = Rljson.exampleWithLink;
 
         const jsonWithBrokenLink = rljson.addData({
@@ -444,9 +446,9 @@ describe('Rljson', () => {
     });
   });
 
-  describe('data', () => {
-    describe('returns the data where the _data list is replaced by a map', () => {
-      it('with example', () => {
+  suite('data', () => {
+    suite('returns the data where the _data list is replaced by a map', () => {
+      test('with example', () => {
         expect(rljson.data).toEqual({
           '@tableA': {
             [a0Hash]: {
@@ -471,7 +473,7 @@ describe('Rljson', () => {
         });
       });
 
-      it('with added data', () => {
+      test('with added data', () => {
         const rljson2 = rljson.addData({
           '@tableC': {
             _data: [{ keyC0: 'c0' }],
@@ -510,9 +512,9 @@ describe('Rljson', () => {
     });
   });
 
-  describe('hash(table, index)', () => {
-    describe('returns', () => {
-      it('the hash of the item at the index of the table', () => {
+  suite('hash(table, index)', () => {
+    suite('returns', () => {
+      test('the hash of the item at the index of the table', () => {
         expect(rljson.hash({ table: '@tableA', index: 0 })).toBe(a0Hash);
         expect(rljson.hash({ table: '@tableA', index: 1 })).toBe(a1Hash);
         expect(rljson.hash({ table: '@tableB', index: 0 })).toBe(b0Hash);
@@ -520,8 +522,8 @@ describe('Rljson', () => {
       });
     });
 
-    describe('throws', () => {
-      it('when table does not exist', () => {
+    suite('throws', () => {
+      test('when table does not exist', () => {
         let exception;
 
         try {
@@ -533,7 +535,7 @@ describe('Rljson', () => {
         expect(exception.toString()).toBe('Error: Table "@tableC" not found.');
       });
 
-      it('when index is out of range', () => {
+      test('when index is out of range', () => {
         let exception;
 
         try {

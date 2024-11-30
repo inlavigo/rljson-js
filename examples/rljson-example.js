@@ -5,7 +5,7 @@
 // found in the LICENSE file in the root of this package.
 
 import { addHashes } from 'gg-json-hash';
-import { Rljson } from '../src/rljson.js';
+import { Rljson } from 'rljson.js';
 
 // .............................................................
 console.log('Create tables');
