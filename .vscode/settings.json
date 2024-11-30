@@ -1,0 +1,21 @@
+{
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always",
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "always"
+  },
+  "eslint.codeActionsOnSave.mode": "all",
+  "testing.coverageToolbarEnabled": true,
+  "coverage-gutters.coverageBaseDir": "coverage/**",
+  "coverage-gutters.showLineCoverage": true,
+  "coverage-gutters.showRulerCoverage": true,
+  "debug.inlineValues": "on",
+  "testing.defaultGutterClickAction": "run",
+  "testing.coverageBarThresholds": {
+    "red": 0,
+    "yellow": 99,
+    "green": 100
+  }
+}
