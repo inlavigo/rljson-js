@@ -17,5 +17,7 @@ extensions.json
 vite.config.js
 *.tgz
 
+tsconfig.json
+
 README.dev.md
 teaser.webp

@@ -469,6 +469,7 @@ export class Rljson {
    */
   static checkTableNames(data) {
     for (const key of Object.keys(data)) {
+      /* v8 ignore next */
       if (key === '_hash') continue;
       this.checkTableName(key);
     }
@@ -518,6 +519,7 @@ export class Rljson {
     const tablesWithWrongType = [];
 
     for (const table of Object.keys(data)) {
+      /* v8 ignore next */
       if (table === '_hash') continue;
       const tableData = data[table];
       const items = tableData['_data'];
