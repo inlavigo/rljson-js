@@ -86,7 +86,7 @@ export class Rljson {
   addData(addedData, options = { validateHashes: false }) {
     const { validateHashes = false } = options;
     this._checkData(addedData);
-    this._checkTableNames(addedData);
+    Rljson.checkTableNames(addedData);
 
     if (validateHashes) {
       this.jsonJash.validate(addedData);
@@ -230,7 +230,7 @@ export class Rljson {
     }
 
     // Return item value when no link or links are not followed
-    if (!key1.startsWith('@')) {
+    if (!key1.endsWith('Ref')) {
       if (key2 != null) {
         throw new Error(
           `Invalid key "${key2}". Additional keys are only allowed for links. But key "${key1}" points to a value.`,
@@ -241,7 +241,7 @@ export class Rljson {
     }
 
     // Follow links
-    const targetTable = key1;
+    const targetTable = key1.substring(0, key1.length - 3);
     const targetHash = itemValue;
 
     return this.get({
@@ -310,9 +310,10 @@ export class Rljson {
         for (const key of Object.keys(item)) {
           if (key === '_hash') continue;
 
-          if (key.startsWith('@')) {
+          if (key.endsWith('Ref')) {
             // Check if linked table exists
-            const linkTable = this.data[key];
+            const tableName = key.substring(0, key.length - 3);
+            const linkTable = this.data[tableName];
             const hash = item['_hash'];
 
             if (linkTable == null) {
@@ -327,7 +328,7 @@ export class Rljson {
 
             if (linkedItem == null) {
               throw new Error(
-                `Table "${table}" has an item "${hash}" which links to not existing item "${targetHash}" in table "${key}".`,
+                `Table "${table}" has an item "${hash}" which links to not existing item "${targetHash}" in table "${tableName}".`,
               );
             }
           }
@@ -343,7 +344,7 @@ export class Rljson {
    */
   static get example() {
     return Rljson.fromJson({
-      '@tableA': {
+      tableA: {
         _data: [
           {
             keyA0: 'a0',
@@ -353,7 +354,7 @@ export class Rljson {
           },
         ],
       },
-      '@tableB': {
+      tableB: {
         _data: [
           {
             keyB0: 'b0',
@@ -373,7 +374,7 @@ export class Rljson {
    */
   static get exampleWithLink() {
     return Rljson.fromJson({
-      '@tableA': {
+      tableA: {
         _data: [
           {
             keyA0: 'a0',
@@ -383,10 +384,10 @@ export class Rljson {
           },
         ],
       },
-      '@linkToTableA': {
+      linkToTableA: {
         _data: [
           {
-            '@tableA': 'KFQrf4mEz0UPmUaFHwH4T6',
+            tableARef: 'KFQrf4mEz0UPmUaFHwH4T6',
           },
         ],
       },
@@ -404,7 +405,7 @@ export class Rljson {
 
     // Create a table d
     rljson = rljson.addData({
-      '@d': {
+      d: {
         _data: [
           {
             value: 'd',
@@ -414,14 +415,14 @@ export class Rljson {
     });
 
     // Get the hash of d
-    const hashD = rljson.hash({ table: '@d', index: 0 });
+    const hashD = rljson.hash({ table: 'd', index: 0 });
 
     // Create a second table c linking to d
     rljson = rljson.addData({
-      '@c': {
+      c: {
         _data: [
           {
-            '@d': hashD,
+            dRef: hashD,
             value: 'c',
           },
         ],
@@ -429,14 +430,14 @@ export class Rljson {
     });
 
     // Get the hash of c
-    const hashC = rljson.hash({ table: '@c', index: 0 });
+    const hashC = rljson.hash({ table: 'c', index: 0 });
 
     // Create a third table b linking to c
     rljson = rljson.addData({
-      '@b': {
+      b: {
         _data: [
           {
-            '@c': hashC,
+            cRef: hashC,
             value: 'b',
           },
         ],
@@ -444,14 +445,14 @@ export class Rljson {
     });
 
     // Get the hash of b
-    const hashB = rljson.hash({ table: '@b', index: 0 });
+    const hashB = rljson.hash({ table: 'b', index: 0 });
 
     // Create a first table a linking to b
     rljson = rljson.addData({
-      '@a': {
+      a: {
         _data: [
           {
-            '@b': hashB,
+            bRef: hashB,
             value: 'a',
           },
         ],
@@ -461,26 +462,50 @@ export class Rljson {
     return rljson;
   }
 
-  // ######################
-  // Private
-  // ######################
-
   // ...........................................................................
   /**
    * Checks if table names are valid
    * @param {Rltables} data
    */
-  _checkTableNames(data) {
+  static checkTableNames(data) {
     for (const key of Object.keys(data)) {
       if (key === '_hash') continue;
-
-      if (key.startsWith('@')) {
-        continue;
-      }
-
-      throw new Error(`Table name must start with @: ${key}`);
+      this.checkTableName(key);
     }
   }
+
+  // ...........................................................................
+  /**
+   * Checks if a string is valid table name
+   *
+   * @param {string} str
+   */
+  static checkTableName(str) {
+    // Table name must only contain letters and numbers.
+    if (!/^[a-zA-Z0-9]+$/.test(str)) {
+      throw new Error(
+        `Invalid table name: ${str}. Only letters and numbers are allowed.`,
+      );
+    }
+
+    // Table names must not end with Ref
+    if (str.endsWith('Ref')) {
+      throw new Error(
+        `Invalid table name: ${str}. Table names must not end with "Ref".`,
+      );
+    }
+
+    // Table names must not start with an number
+    if (/^[0-9]/.test(str)) {
+      throw new Error(
+        `Invalid table name: ${str}. Table names must not start with a number.`,
+      );
+    }
+  }
+
+  // ######################
+  // Private
+  // ######################
 
   // ...........................................................................
   /**

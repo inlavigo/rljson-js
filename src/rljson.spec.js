@@ -31,10 +31,10 @@ suite('Rljson', () => {
 
   beforeEach(() => {
     rljson = Rljson.example;
-    a0Hash = rljson.hash({ table: '@tableA', index: 0 });
-    a1Hash = rljson.hash({ table: '@tableA', index: 1 });
-    b0Hash = rljson.hash({ table: '@tableB', index: 0 });
-    b1Hash = rljson.hash({ table: '@tableB', index: 1 });
+    a0Hash = rljson.hash({ table: 'tableA', index: 0 });
+    a1Hash = rljson.hash({ table: 'tableA', index: 1 });
+    b0Hash = rljson.hash({ table: 'tableB', index: 0 });
+    b1Hash = rljson.hash({ table: 'tableB', index: 1 });
 
     assert(a0Hash.length === 22);
     assert(a1Hash.length === 22);
@@ -45,10 +45,10 @@ suite('Rljson', () => {
   suite('ls()', () => {
     test('lists the paths of all items', () => {
       expect(rljson.ls()).toEqual([
-        '@tableA/KFQrf4mEz0UPmUaFHwH4T6/keyA0',
-        '@tableA/YPw-pxhqaUOWRFGramr4B1/keyA1',
-        '@tableB/nmejjLAUhygiT6WFDPPsHy/keyB0',
-        '@tableB/dXhIygNwNMVPEqFbsFJkn6/keyB1',
+        'tableA/KFQrf4mEz0UPmUaFHwH4T6/keyA0',
+        'tableA/YPw-pxhqaUOWRFGramr4B1/keyA1',
+        'tableB/nmejjLAUhygiT6WFDPPsHy/keyB0',
+        'tableB/dXhIygNwNMVPEqFbsFJkn6/keyB1',
       ]);
     });
   });
@@ -56,7 +56,7 @@ suite('Rljson', () => {
   suite('fromData(data)', () => {
     test('adds hashes to all fields', () => {
       expect(rljson.data).toEqual({
-        '@tableA': {
+        tableA: {
           [a0Hash]: {
             keyA0: 'a0',
             _hash: a0Hash,
@@ -66,7 +66,7 @@ suite('Rljson', () => {
             _hash: a1Hash,
           },
         },
-        '@tableB': {
+        tableB: {
           [b0Hash]: {
             keyB0: 'b0',
             _hash: b0Hash,
@@ -83,7 +83,7 @@ suite('Rljson', () => {
   suite('table(String table)', () => {
     suite('returns', () => {
       test('the table when existing', () => {
-        const table = rljson.table('@tableA');
+        const table = rljson.table('tableA');
         expect(table).toEqual({
           [a0Hash]: {
             keyA0: 'a0',
@@ -102,12 +102,12 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.table('@tableC');
+          rljson.table('tableC');
         } catch (/** @type {any} */ e) {
           exception = e;
         }
 
-        expect(exception.toString()).toBe('Error: Table not found: @tableC');
+        expect(exception.toString()).toBe('Error: Table not found: tableC');
       });
     });
   });
@@ -115,7 +115,7 @@ suite('Rljson', () => {
   suite('items(table, where)', () => {
     test('returns the items that match the query', () => {
       const items = rljson.items({
-        table: '@tableA',
+        table: 'tableA',
         where: (item) => item['keyA0'] === 'a0',
       });
 
@@ -126,7 +126,7 @@ suite('Rljson', () => {
   suite('item(table, hash)', () => {
     suite('returns', () => {
       test('the item when existing', () => {
-        const item = rljson.item('@tableA', a0Hash);
+        const item = rljson.item('tableA', a0Hash);
         expect(item).toEqual({
           keyA0: 'a0',
           _hash: a0Hash,
@@ -139,25 +139,25 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.item('@tableC', a0Hash);
+          rljson.item('tableC', a0Hash);
         } catch (/** @type {any} */ e) {
           exception = e;
         }
 
-        expect(exception.toString()).toBe('Error: Table not found: @tableC');
+        expect(exception.toString()).toBe('Error: Table not found: tableC');
       });
 
       test('when hash is not available', () => {
         let exception;
 
         try {
-          rljson.item('@tableA', 'nonExistingHash');
+          rljson.item('tableA', 'nonExistingHash');
         } catch (/** @type {any} */ e) {
           exception = e;
         }
 
         expect(exception.toString()).toBe(
-          'Error: Item not found with hash "nonExistingHash" in table "@tableA"',
+          'Error: Item not found with hash "nonExistingHash" in table "tableA"',
         );
       });
     });
@@ -168,7 +168,7 @@ suite('Rljson', () => {
       test('the value of the key of the item with hash in table', () => {
         expect(
           rljson.get({
-            table: '@tableA',
+            table: 'tableA',
             item: a0Hash,
             key1: 'keyA0',
           }),
@@ -176,7 +176,7 @@ suite('Rljson', () => {
       });
 
       test('the complete item, when no key is given', () => {
-        expect(rljson.get({ table: '@tableA', item: a0Hash })).toEqual({
+        expect(rljson.get({ table: 'tableA', item: a0Hash })).toEqual({
           keyA0: 'a0',
           _hash: a0Hash,
         });
@@ -186,28 +186,30 @@ suite('Rljson', () => {
         rljson = Rljson.exampleWithLink;
 
         const tableALinkHash = rljson.hash({
-          table: '@linkToTableA',
+          table: 'linkToTableA',
           index: 0,
         });
 
         expect(
           rljson.get({
-            table: '@linkToTableA',
+            table: 'linkToTableA',
             item: tableALinkHash,
-            key1: '@tableA',
+            key1: 'tableARef',
           }),
         ).toEqual({ _hash: a0Hash, keyA0: 'a0' });
       });
 
       test('the linked value across multiple tables using key2 to key4', () => {
         rljson = Rljson.exampleWithDeepLink;
+        const hash = Object.keys(rljson.data.a)[0];
+
         expect(
           rljson.get({
-            table: '@a',
-            item: 'GnSVp1CmoAo3rPiiGl44p-',
-            key1: '@b',
-            key2: '@c',
-            key3: '@d',
+            table: 'a',
+            item: hash,
+            key1: 'bRef',
+            key2: 'cRef',
+            key3: 'dRef',
             key4: 'value',
           }),
         ).toBe('d');
@@ -220,7 +222,7 @@ suite('Rljson', () => {
 
         try {
           rljson.get({
-            table: '@tableA',
+            table: 'tableA',
             item: a0Hash,
             key1: 'nonExistingKey',
           });
@@ -229,7 +231,7 @@ suite('Rljson', () => {
         }
 
         expect(exception.toString()).toBe(
-          'Error: Key "nonExistingKey" not found in item with hash "KFQrf4mEz0UPmUaFHwH4T6" in table "@tableA"',
+          'Error: Key "nonExistingKey" not found in item with hash "KFQrf4mEz0UPmUaFHwH4T6" in table "tableA"',
         );
       });
 
@@ -238,7 +240,7 @@ suite('Rljson', () => {
 
         try {
           rljson.get({
-            table: '@tableA',
+            table: 'tableA',
             item: a0Hash,
             key1: 'keyA0',
             key2: 'keyA1',
@@ -262,7 +264,7 @@ suite('Rljson', () => {
         try {
           rljson.addData(
             {
-              '@tableA': {
+              tableA: {
                 _data: [{ keyA0: 'a0' }],
               },
             },
@@ -273,25 +275,6 @@ suite('Rljson', () => {
         }
 
         expect(exception.toString()).toBe('Error: Hash is missing.');
-      });
-
-      test('when table names do not start with @', () => {
-        let exception;
-
-        try {
-          rljson.addData({
-            _hash: 'xyz',
-            tableA: { _hash: 'hash', _data: [] },
-            tableB: { _data: [] },
-            tableC: { _data: [] },
-          });
-        } catch (/** @type {any} */ e) {
-          exception = e;
-        }
-
-        expect(exception.toString()).toBe(
-          'Error: Table name must start with @: tableA',
-        );
       });
 
       test('when tables do not contain a _data object', () => {
@@ -335,44 +318,46 @@ suite('Rljson', () => {
 
     test('adds data to the json', () => {
       const rljson2 = rljson.addData({
-        '@tableA': {
+        tableA: {
           _data: [{ keyA2: 'a2' }],
         },
       });
 
-      const items = rljson2.originalData['@tableA']['_data'];
+      const hashA2 = rljson2.originalData.tableA._data[2]._hash;
+
+      const items = rljson2.originalData.tableA._data;
       expect(items).toEqual([
         { keyA0: 'a0', _hash: a0Hash },
         { keyA1: 'a1', _hash: a1Hash },
-        { keyA2: 'a2', _hash: 'apLP3I2XLnVm13umIZdVhV' },
+        { keyA2: 'a2', _hash: hashA2 },
       ]);
     });
 
     test('replaces data when the added table is not yet existing', () => {
       const rljson2 = rljson.addData({
-        '@tableC': {
+        tableC: {
           _data: [{ keyC0: 'c0' }],
         },
       });
 
       const items = rljson2.ls();
       expect(items).toEqual([
-        '@tableA/KFQrf4mEz0UPmUaFHwH4T6/keyA0',
-        '@tableA/YPw-pxhqaUOWRFGramr4B1/keyA1',
-        '@tableB/nmejjLAUhygiT6WFDPPsHy/keyB0',
-        '@tableB/dXhIygNwNMVPEqFbsFJkn6/keyB1',
-        '@tableC/afNjjrfH8-OfkkEH1uCK14/keyC0',
+        'tableA/KFQrf4mEz0UPmUaFHwH4T6/keyA0',
+        'tableA/YPw-pxhqaUOWRFGramr4B1/keyA1',
+        'tableB/nmejjLAUhygiT6WFDPPsHy/keyB0',
+        'tableB/dXhIygNwNMVPEqFbsFJkn6/keyB1',
+        'tableC/afNjjrfH8-OfkkEH1uCK14/keyC0',
       ]);
     });
 
     test('does not cause duplicates', () => {
       const rljson2 = rljson.addData({
-        '@tableA': {
+        tableA: {
           _data: [{ keyA1: 'a1' }],
         },
       });
 
-      const items = rljson2.originalData['@tableA']['_data'];
+      const items = rljson2.originalData.tableA._data;
       expect(items).toEqual([
         { keyA0: 'a0', _hash: a0Hash },
         { keyA1: 'a1', _hash: a1Hash },
@@ -391,16 +376,16 @@ suite('Rljson', () => {
         rljson = Rljson.exampleWithLink;
 
         const jsonWithBrokenLink = rljson.addData({
-          '@tableA': {
+          tableA: {
             _data: [
               {
-                '@nonExistingTable': 'a2',
+                nonExistingTableRef: 'a2',
               },
             ],
           },
         });
 
-        a0Hash = jsonWithBrokenLink.hash({ table: '@tableA', index: 2 });
+        a0Hash = jsonWithBrokenLink.hash({ table: 'tableA', index: 2 });
 
         let message;
 
@@ -411,7 +396,7 @@ suite('Rljson', () => {
         }
 
         expect(message).toBe(
-          `Error: Table "@tableA" has an item "${a0Hash}" which links to not existing table "@nonExistingTable".`,
+          `Error: Table "tableA" has an item "Bg6wGMJaKpfLImKIRtP2Ct" which links to not existing table "nonExistingTableRef".`,
         );
       });
 
@@ -419,17 +404,17 @@ suite('Rljson', () => {
         rljson = Rljson.exampleWithLink;
 
         const jsonWithBrokenLink = rljson.addData({
-          '@linkToTableA': {
+          linkToTableA: {
             _data: [
               {
-                '@tableA': 'brokenHash',
+                tableARef: 'brokenHash',
               },
             ],
           },
         });
 
         const linkToTableAHash = jsonWithBrokenLink.hash({
-          table: '@linkToTableA',
+          table: 'linkToTableA',
           index: 1,
         });
 
@@ -442,7 +427,7 @@ suite('Rljson', () => {
         }
 
         expect(message).toBe(
-          `Error: Table "@linkToTableA" has an item "${linkToTableAHash}" which links to not existing item "brokenHash" in table "@tableA".`,
+          `Error: Table "linkToTableA" has an item "${linkToTableAHash}" which links to not existing item "brokenHash" in table "tableA".`,
         );
       });
     });
@@ -452,7 +437,7 @@ suite('Rljson', () => {
     suite('returns the data where the _data list is replaced by a map', () => {
       test('with example', () => {
         expect(rljson.data).toEqual({
-          '@tableA': {
+          tableA: {
             [a0Hash]: {
               keyA0: 'a0',
               _hash: a0Hash,
@@ -462,7 +447,7 @@ suite('Rljson', () => {
               _hash: a1Hash,
             },
           },
-          '@tableB': {
+          tableB: {
             [b0Hash]: {
               keyB0: 'b0',
               _hash: b0Hash,
@@ -477,13 +462,13 @@ suite('Rljson', () => {
 
       test('with added data', () => {
         const rljson2 = rljson.addData({
-          '@tableC': {
+          tableC: {
             _data: [{ keyC0: 'c0' }],
           },
         });
 
         expect(rljson2.data).toEqual({
-          '@tableA': {
+          tableA: {
             [a0Hash]: {
               keyA0: 'a0',
               _hash: a0Hash,
@@ -493,7 +478,7 @@ suite('Rljson', () => {
               _hash: a1Hash,
             },
           },
-          '@tableB': {
+          tableB: {
             [b0Hash]: {
               keyB0: 'b0',
               _hash: b0Hash,
@@ -503,7 +488,7 @@ suite('Rljson', () => {
               _hash: b1Hash,
             },
           },
-          '@tableC': {
+          tableC: {
             'afNjjrfH8-OfkkEH1uCK14': {
               keyC0: 'c0',
               _hash: 'afNjjrfH8-OfkkEH1uCK14',
@@ -517,10 +502,10 @@ suite('Rljson', () => {
   suite('hash(table, index)', () => {
     suite('returns', () => {
       test('the hash of the item at the index of the table', () => {
-        expect(rljson.hash({ table: '@tableA', index: 0 })).toBe(a0Hash);
-        expect(rljson.hash({ table: '@tableA', index: 1 })).toBe(a1Hash);
-        expect(rljson.hash({ table: '@tableB', index: 0 })).toBe(b0Hash);
-        expect(rljson.hash({ table: '@tableB', index: 1 })).toBe(b1Hash);
+        expect(rljson.hash({ table: 'tableA', index: 0 })).toBe(a0Hash);
+        expect(rljson.hash({ table: 'tableA', index: 1 })).toBe(a1Hash);
+        expect(rljson.hash({ table: 'tableB', index: 0 })).toBe(b0Hash);
+        expect(rljson.hash({ table: 'tableB', index: 1 })).toBe(b1Hash);
       });
     });
 
@@ -529,27 +514,77 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.hash({ table: '@tableC', index: 0 });
+          rljson.hash({ table: 'tableC', index: 0 });
         } catch (/** @type {any} */ e) {
           exception = e;
         }
 
-        expect(exception.toString()).toBe('Error: Table "@tableC" not found.');
+        expect(exception.toString()).toBe('Error: Table "tableC" not found.');
       });
 
       test('when index is out of range', () => {
         let exception;
 
         try {
-          rljson.hash({ table: '@tableA', index: 2 });
+          rljson.hash({ table: 'tableA', index: 2 });
         } catch (/** @type {any} */ e) {
           exception = e;
         }
 
         expect(exception.toString()).toBe(
-          'Error: Index 2 out of range in table "@tableA".',
+          'Error: Index 2 out of range in table "tableA".',
         );
       });
+    });
+  });
+
+  suite('checkTableNames(data)', () => {
+    test('throws when table names contain other chars then letters and numbers', () => {
+      let exception;
+
+      try {
+        Rljson.checkTableNames({
+          'tableA/': {},
+        });
+      } catch (/** @type {any} */ e) {
+        exception = e;
+      }
+
+      expect(exception.toString()).toBe(
+        'Error: Invalid table name: tableA/. Only letters and numbers are allowed.',
+      );
+    });
+
+    test('throws when table names end with Ref', () => {
+      let exception;
+
+      try {
+        Rljson.checkTableNames({
+          tableARef: {},
+        });
+      } catch (/** @type {any} */ e) {
+        exception = e;
+      }
+
+      expect(exception.toString()).toBe(
+        'Error: Invalid table name: tableARef. Table names must not end with "Ref".',
+      );
+    });
+
+    test('throws when table names start with numbers', () => {
+      let exception;
+
+      try {
+        Rljson.checkTableNames({
+          '5tableA': {},
+        });
+      } catch (/** @type {any} */ e) {
+        exception = e;
+      }
+
+      expect(exception.toString()).toBe(
+        'Error: Invalid table name: 5tableA. Table names must not start with a number.',
+      );
     });
   });
 });

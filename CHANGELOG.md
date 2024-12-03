@@ -1,5 +1,10 @@
 # Changelog
 
+## [3.0.0]
+
+- Breaking change: Use Ref postfix instead of @
+- Table names must only contain numbers and strings
+
 ## [2.0.4]
 
 - Update README.md

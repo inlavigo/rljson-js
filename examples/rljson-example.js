@@ -13,10 +13,10 @@ const jh = JsonHash.default;
 console.log('Create tables');
 
 let db = Rljson.fromJson({
-  '@tableA': {
+  tableA: {
     _data: [{ a: 'a0' }, { a: 'a1' }],
   },
-  '@tableB': {
+  tableB: {
     _data: [{ b: 'b0' }, { b: 'b1' }],
   },
 });
@@ -24,36 +24,36 @@ let db = Rljson.fromJson({
 // .............................................................
 console.log('Each item in the table gets an content based hash code');
 
-const hashA0 = db.hash({ table: '@tableA', index: 0 });
-const hashA1 = db.hash({ table: '@tableA', index: 1 });
-const hashB0 = db.hash({ table: '@tableB', index: 0 });
-const hashB1 = db.hash({ table: '@tableB', index: 1 });
+const hashA0 = db.hash({ table: 'tableA', index: 0 });
+const hashA1 = db.hash({ table: 'tableA', index: 1 });
+const hashB0 = db.hash({ table: 'tableB', index: 0 });
+const hashB1 = db.hash({ table: 'tableB', index: 1 });
 
 // .............................................................
 console.log('The hashcode can be used to access data');
-const a0 = db.get({ table: '@tableA', item: hashA0, key1: 'a' });
+const a0 = db.get({ table: 'tableA', item: hashA0, key1: 'a' });
 console.log(a0); // a0
 
-const a1 = db.get({ table: '@tableA', item: hashA1, key1: 'a' });
+const a1 = db.get({ table: 'tableA', item: hashA1, key1: 'a' });
 console.log(a1); // a1
 
-const b0 = db.get({ table: '@tableB', item: hashB0, key1: 'b' });
+const b0 = db.get({ table: 'tableB', item: hashB0, key1: 'b' });
 console.log(b0); // b0
 
-const b1 = db.get({ table: '@tableB', item: hashB1, key1: 'b' });
+const b1 = db.get({ table: 'tableB', item: hashB1, key1: 'b' });
 console.log(b1); // b1
 
 // .............................................................
 console.log('Add and merge additional data. The original table is not changed');
 
 db = db.addData({
-  '@tableA': {
+  tableA: {
     _data: [{ a: 'a2' }],
   },
-  '@tableB': {
+  tableB: {
     _data: [{ b: 'b2' }],
   },
-  '@tableC': {
+  tableC: {
     _data: [{ c: 'c0' }],
   },
 });
@@ -67,7 +67,7 @@ console.log(allPaths.map((path) => `- ${path}`).join('\n'));
 console.log('Create interconnected tables');
 
 db = Rljson.fromJson({
-  '@a': {
+  a: {
     _data: [
       {
         value: 'a',
@@ -76,27 +76,27 @@ db = Rljson.fromJson({
   },
 });
 
-const tableAValueHash = db.hash({ table: '@a', index: 0 });
+const tableAValueHash = db.hash({ table: 'a', index: 0 });
 
 db = db.addData({
-  '@b': {
+  b: {
     _data: [
       {
-        '@a': tableAValueHash,
+        aRef: tableAValueHash,
       },
     ],
   },
 });
 
-const tableBValueHash = db.hash({ table: '@b', index: 0 });
+const tableBValueHash = db.hash({ table: 'b', index: 0 });
 
 // .............................................................
 console.log('Join tables when reading values');
 
 const a = db.get({
-  table: '@b',
+  table: 'b',
   item: tableBValueHash,
-  key1: '@a',
+  key1: 'aRef',
   key2: 'value',
 });
 
@@ -105,7 +105,7 @@ console.log(a); // a
 // .............................................................
 console.log('To hash data in advance use gg_json_hash');
 const hashedData = jh.apply({
-  '@tableA': {
+  tableA: {
     _data: [{ a: 'a0' }, { a: 'a1' }],
   },
 });
