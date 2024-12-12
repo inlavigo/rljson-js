@@ -1,6 +1,6 @@
 {
   "name": "rljson",
-  "version": "3.0.2",
+  "version": "3.0.3",
   "main": "dist/rljson.js",
   "types": "dist/rljson.d.ts",
   "scripts": {
@@ -30,6 +30,6 @@
     "vitest": "^2.1.6"
   },
   "dependencies": {
-    "gg-json-hash": "^2.1.4"
+    "gg-json-hash": "^2.1.5"
   }
 }
