@@ -26,9 +26,9 @@ preserving the benefits of relational modeling.
 
 ## Example
 
-```js
+```typescript
 import { JsonHash } from 'gg-json-hash';
-import { Rljson } from '../src/rljson.js';
+import { Rljson } from 'rljson';
 
 const jh = JsonHash.default;
 

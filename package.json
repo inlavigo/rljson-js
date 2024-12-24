@@ -1,11 +1,13 @@
 {
   "name": "rljson",
-  "version": "3.0.5",
+  "version": "3.0.6",
   "description": "Define and manage relational data structures in JSON",
   "license": "MIT",
   "author": "Dr. Gabriel Gatzsche",
-  "main": "dist/rljson.cjs.js",
+  "main": "dist/rljson.js",
   "module": "dist/rljson.es.js",
+  "umd": "dist/rljson.umd.js",
+  "cjs": "dist/rljson.cjs.js",
   "types": "dist/types/index.d.ts",
   "files": [
     "dist"

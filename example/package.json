@@ -15,7 +15,7 @@
   "type": "module",
   "dependencies": {
     "gg-json-hash": "^2.1.5",
-    "rljson": "^3.0.4",
+    "rljson": "..",
     "typescript": "^5.7.2",
     "vite-node": "^2.1.8"
   }
