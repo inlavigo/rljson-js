@@ -11,7 +11,10 @@
   "types": "dist/types/index.d.ts",
   "files": [
     "dist",
-    "example"
+    "example/src",
+    "example/package.json",
+    "example/tsconfig.json",
+    "example/README.md"
   ],
   "type": "module",
   "scripts": {
