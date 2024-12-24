@@ -7,7 +7,7 @@
 import { assert } from 'console';
 import { beforeEach, expect, suite, test } from 'vitest';
 
-import { Rljson } from './rljson.js';
+import { Rljson } from '../src/rljson';
 
 suite('Rljson', () => {
   let rljson: Rljson;
