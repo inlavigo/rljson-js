@@ -4,30 +4,17 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
+import { assert } from 'console';
 import { beforeEach, expect, suite, test } from 'vitest';
 
-import { assert } from 'console';
 import { Rljson } from './rljson.js';
 
 suite('Rljson', () => {
-  /** @type Rljson */
-  let rljson;
-  /**
-   * @type {string}
-   */
-  let a0Hash;
-  /**
-   * @type {string}
-   */
-  let a1Hash;
-  /**
-   * @type {string}
-   */
-  let b0Hash;
-  /**
-   * @type {string}
-   */
-  let b1Hash;
+  let rljson: Rljson;
+  let a0Hash: string;
+  let a1Hash: string;
+  let b0Hash: string;
+  let b1Hash: string;
 
   beforeEach(() => {
     rljson = Rljson.example;
@@ -103,7 +90,7 @@ suite('Rljson', () => {
 
         try {
           rljson.table('tableC');
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -140,7 +127,7 @@ suite('Rljson', () => {
 
         try {
           rljson.item('tableC', a0Hash);
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -152,7 +139,7 @@ suite('Rljson', () => {
 
         try {
           rljson.item('tableA', 'nonExistingHash');
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -226,7 +213,7 @@ suite('Rljson', () => {
             item: a0Hash,
             key1: 'nonExistingKey',
           });
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -245,7 +232,7 @@ suite('Rljson', () => {
             key1: 'keyA0',
             key2: 'keyA1',
           });
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -270,7 +257,7 @@ suite('Rljson', () => {
             },
             { validateHashes: true },
           );
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -285,7 +272,7 @@ suite('Rljson', () => {
             '@tableA': {},
             '@tableB': {},
           });
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -306,7 +293,7 @@ suite('Rljson', () => {
               _data: {},
             },
           });
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -391,7 +378,7 @@ suite('Rljson', () => {
 
         try {
           jsonWithBrokenLink.checkLinks();
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           message = e.toString();
         }
 
@@ -422,7 +409,7 @@ suite('Rljson', () => {
 
         try {
           jsonWithBrokenLink.checkLinks();
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           message = e.toString();
         }
 
@@ -515,7 +502,7 @@ suite('Rljson', () => {
 
         try {
           rljson.hash({ table: 'tableC', index: 0 });
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -527,7 +514,7 @@ suite('Rljson', () => {
 
         try {
           rljson.hash({ table: 'tableA', index: 2 });
-        } catch (/** @type {any} */ e) {
+        } catch (e: any) {
           exception = e;
         }
 
@@ -546,7 +533,7 @@ suite('Rljson', () => {
         Rljson.checkTableNames({
           'tableA/': {},
         });
-      } catch (/** @type {any} */ e) {
+      } catch (e: any) {
         exception = e;
       }
 
@@ -562,7 +549,7 @@ suite('Rljson', () => {
         Rljson.checkTableNames({
           tableARef: {},
         });
-      } catch (/** @type {any} */ e) {
+      } catch (e: any) {
         exception = e;
       }
 
@@ -578,13 +565,22 @@ suite('Rljson', () => {
         Rljson.checkTableNames({
           '5tableA': {},
         });
-      } catch (/** @type {any} */ e) {
+      } catch (e: any) {
         exception = e;
       }
 
       expect(exception.toString()).toBe(
         'Error: Invalid table name: 5tableA. Table names must not start with a number.',
       );
+    });
+
+    test('does nothing when it is feed with valid data', () => {
+      expect(() =>
+        Rljson.checkTableNames({
+          tableA: { _hash: 'ABC' },
+          _hash: 'xyz',
+        } as any),
+      ).not.toThrow();
     });
   });
 });

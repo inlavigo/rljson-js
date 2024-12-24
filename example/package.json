@@ -1,0 +1,22 @@
+{
+  "name": "rljson-example",
+  "version": "1.0.0",
+  "main": "rljson-example.js",
+  "scripts": {
+    "build": "tsc",
+    "postbuild": "chmod +x dist/rljson-example.js"
+  },
+  "bin": {
+    "rljson-example": "dist/rljson-example.js"
+  },
+  "author": "Dr. Gabriel Gatzsche",
+  "license": "MIT",
+  "description": "",
+  "type": "module",
+  "dependencies": {
+    "gg-json-hash": "^2.1.5",
+    "rljson": "^3.0.4",
+    "typescript": "^5.7.2",
+    "vite-node": "^2.1.8"
+  }
+}

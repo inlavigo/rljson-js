@@ -6,55 +6,65 @@
 
 import { JsonHash } from 'gg-json-hash';
 
-/**
- * A simple json map
- * @typedef {{ [key: string]: any }} Rlmap
- */
+interface Rlmap {
+  [key: string]: any;
+  _hash?: string;
+}
 
-/**
- * A map of tables
- * @typedef {{ [key: string]: Rlmap }} Rltables
- */
+interface Rltables {
+  [key: string]: Rlmap;
+  _hash?: any;
+}
 
-/**
- * Manages a normalized JSON data structure
- *
- * composed of tables '@tableA', '@tableB', etc.
- * Each table contains an _data array, which contains data items.
- * Each data item has an hash calculated using gg_json_hash.
- */
+interface RljsonConstructorParams {
+  originalData: Rltables;
+  data: Rltables;
+}
+
+interface QueryOptions {
+  table: string;
+  where: (item: Rlmap) => boolean;
+}
+
+interface GetOptions {
+  table: string;
+  item: string;
+  key1?: string;
+  key2?: string;
+  key3?: string;
+  key4?: string;
+}
+
+interface HashOptions {
+  table: string;
+  index: number;
+}
+
+interface FromJsonOptions {
+  validateHashes: boolean;
+}
+
+/// Manages a normalized JSON data structure
+///
+/// composed of tables '@tableA', '@tableB', etc.
+/// Each table contains an _data array, which contains data items.
+/// Each data item has an hash calculated using gg_json_hash.
 export class Rljson {
-  /**
-   * Creates an instance of Rljson.
-   * @class
-   * @param {object} params - The parameters for creating a Rljson instance
-   * @param {Rltables} params.originalData - The original data
-   * @param {Rlmap} params.data - The processed data
-   */
-  constructor({ originalData, data }) {
-    /**
-     * @type {*}
-     * @description The original data
-     */
-    this.originalData = originalData;
+  public originalData: Rltables;
+  public data: Rltables;
+  private jsonJash = JsonHash.default;
 
-    /**
-     * @type {*}
-     * @description The processed data
-     */
+  /// Creates an instance of Rljson.
+  constructor({ originalData, data }: RljsonConstructorParams) {
+    this.originalData = originalData;
     this.data = data;
   }
 
-  jsonJash = JsonHash.default;
-
-  /**
-   * Creates an Rljson instance from JSON data.
-   * @param {Record<string, any>} data - The input data.
-   * @param {object} options - The options.
-   * @param {boolean} options.validateHashes - Whether to validate the hashes.
-   * @returns {Rljson} A new Rljson instance.
-   */
-  static fromJson(data, options = { validateHashes: false }) {
+  /// Creates an Rljson instance from JSON data.
+  static fromJson(
+    data: Record<string, any>,
+    options: Partial<FromJsonOptions> = { validateHashes: false },
+  ): Rljson {
     const { validateHashes = false } = options;
 
     let result = new Rljson({ originalData: {}, data: {} });
@@ -62,28 +72,11 @@ export class Rljson {
     return result;
   }
 
-  // ...........................................................................
-  /**
-   * The json data managed by this object
-   * @type {Rlmap}
-   */
-  originalData;
-
-  /**
-   * Returns a map of tables containing a map of items for fast access
-   * @type {Rltables}
-   */
-  data;
-
-  // ...........................................................................
-  /**
-   * Creates a new json containing the given data
-   * @param {Rlmap} addedData
-   * @param {object} options
-   * @param {boolean} options.validateHashes
-   * @returns {Rljson}
-   */
-  addData(addedData, options = { validateHashes: false }) {
+  /// Creates a new json containing the given data
+  addData(
+    addedData: Rltables,
+    options: Partial<FromJsonOptions> = { validateHashes: false },
+  ): Rljson {
     const { validateHashes = false } = options;
     this._checkData(addedData);
     Rljson.checkTableNames(addedData);
@@ -147,13 +140,8 @@ export class Rljson {
     return new Rljson({ originalData: mergedData, data: mergedMap });
   }
 
-  // ...........................................................................
-  /**
-   * Returns the table with the given name. Throws when name is not found.
-   * @param {string} table
-   * @returns {Rltables}
-   */
-  table(table) {
+  /// Returns the table with the given name. Throws when name is not found.
+  table(table: string): Rltables {
     const tableData = this.data[table];
     if (tableData == null) {
       throw new Error(`Table not found: ${table}`);
@@ -162,28 +150,15 @@ export class Rljson {
     return tableData;
   }
 
-  // ...........................................................................
-  /**
-   * Allows to query data from the json
-   * @param {object} options
-   * @param {string} options.table
-   * @param {function(Rlmap): boolean} options.where
-   * @returns {Rlmap[]}
-   */
-  items({ table, where }) {
+  /// Allows to query data from the json
+  items({ table, where }: QueryOptions): Rlmap[] {
     const tableData = this.table(table);
     const items = Object.values(tableData).filter(where);
     return items;
   }
 
-  // ...........................................................................
-  /**
-   * Allows to query data from the json
-   * @param {string} table
-   * @param {string} hash
-   * @returns {Rlmap}
-   */
-  item(table, hash) {
+  /// Allows to query data from the json
+  item(table: string, hash: string): Rlmap {
     // Get table
     const tableData = this.data[table];
     if (tableData == null) {
@@ -199,19 +174,8 @@ export class Rljson {
     return item;
   }
 
-  // ...........................................................................
-  /**
-   * Queries a value from data. Throws when table or hash is not found.
-   * @param {object} options
-   * @param {string} options.table
-   * @param {string} options.item
-   * @param {string} [options.key1]
-   * @param {string} [options.key2]
-   * @param {string} [options.key3]
-   * @param {string} [options.key4]
-   * @returns {any}
-   */
-  get({ table, item, key1, key2, key3, key4 }) {
+  /// Queries a value from data. Throws when table or hash is not found.
+  get({ table, item, key1, key2, key3, key4 }: GetOptions): any {
     // Get item
     const itemHash = item;
     const resultItem = this.item(table, itemHash);
@@ -253,15 +217,8 @@ export class Rljson {
     });
   }
 
-  // ...........................................................................
-  /**
-   * Returns the hash of the item at the given index in the table
-   * @param {object} options
-   * @param {string} options.table
-   * @param {number} options.index
-   * @returns {string}
-   */
-  hash({ table, index }) {
+  /// Returns the hash of the item at the given index in the table
+  hash({ table, index }: HashOptions): string {
     const tableData = this.originalData[table];
 
     if (tableData == null) {
@@ -277,13 +234,9 @@ export class Rljson {
     return item['_hash'];
   }
 
-  // ...........................................................................
-  /**
-   * Returns all paths found in data
-   * @returns {string[]}
-   */
-  ls() {
-    const result = [];
+  /// Returns all paths found in data
+  ls(): string[] {
+    const result: string[] = [];
     for (const [table, tableData] of Object.entries(this.data)) {
       for (const [hash, item] of Object.entries(tableData)) {
         for (const key of Object.keys(item)) {
@@ -297,11 +250,8 @@ export class Rljson {
     return result;
   }
 
-  // ...........................................................................
-  /**
-   * Throws if a link is not available
-   */
-  checkLinks() {
+  /// Throws if a link is not available
+  checkLinks(): void {
     for (const table of Object.keys(this.data)) {
       const tableData = this.data[table];
 
@@ -337,12 +287,8 @@ export class Rljson {
     }
   }
 
-  // ...........................................................................
-  /**
-   * An example object
-   * @type {Rljson}
-   */
-  static get example() {
+  /// An example object
+  static get example(): Rljson {
     return Rljson.fromJson({
       tableA: {
         _data: [
@@ -367,12 +313,8 @@ export class Rljson {
     });
   }
 
-  // ...........................................................................
-  /**
-   * An example object
-   * @type {Rljson}
-   */
-  static get exampleWithLink() {
+  /// An example object
+  static get exampleWithLink(): Rljson {
     return Rljson.fromJson({
       tableA: {
         _data: [
@@ -394,12 +336,8 @@ export class Rljson {
     });
   }
 
-  // ...........................................................................
-  /**
-   * An example object
-   * @type {Rljson}
-   */
-  static get exampleWithDeepLink() {
+  /// An example object
+  static get exampleWithDeepLink(): Rljson {
     // Create an Rljson instance
     let rljson = Rljson.fromJson({});
 
@@ -462,26 +400,16 @@ export class Rljson {
     return rljson;
   }
 
-  // ...........................................................................
-  /**
-   * Checks if table names are valid
-   * @param {Rltables} data
-   */
-  static checkTableNames(data) {
+  /// Checks if table names are valid
+  static checkTableNames(data: Rltables): void {
     for (const key of Object.keys(data)) {
-      /* v8 ignore next */
       if (key === '_hash') continue;
       this.checkTableName(key);
     }
   }
 
-  // ...........................................................................
-  /**
-   * Checks if a string is valid table name
-   *
-   * @param {string} str
-   */
-  static checkTableName(str) {
+  /// Checks if a string is valid table name
+  static checkTableName(str: string): void {
     // Table name must only contain letters and numbers.
     if (!/^[a-zA-Z0-9]+$/.test(str)) {
       throw new Error(
@@ -504,19 +432,10 @@ export class Rljson {
     }
   }
 
-  // ######################
-  // Private
-  // ######################
-
-  // ...........................................................................
-  /**
-   * Checks if data is valid
-   * @param {Rltables} data
-   * @throws {Error}
-   */
-  _checkData(data) {
-    const tablesWithMissingData = [];
-    const tablesWithWrongType = [];
+  /// Checks if data is valid
+  private _checkData(data: Rltables): void {
+    const tablesWithMissingData: string[] = [];
+    const tablesWithWrongType: string[] = [];
 
     for (const table of Object.keys(data)) {
       /* v8 ignore next */
@@ -545,22 +464,15 @@ export class Rljson {
     }
   }
 
-  // ...........................................................................
-  /**
-   * Turns data into a map
-   * @param {Rltables} data
-   * @returns {Record<string, any>}
-   */
-  _toMap(data) {
-    /** @type {Record<string, any>} */
-    const result = {};
+  /// Turns data into a map
+  private _toMap(data: Rltables): Record<string, any> {
+    const result: Record<string, any> = {};
 
     // Iterate all tables
     for (const table of Object.keys(data)) {
       if (table.startsWith('_')) continue;
 
-      /** @type {Record<string, any>} */
-      const tableData = {};
+      const tableData: Record<string, any> = {};
       result[table] = tableData;
 
       // Turn _data into map

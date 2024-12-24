@@ -1,5 +1,6 @@
 {
   "recommendations": [
+    "angular.ng-template",
     "ryanluker.vscode-coverage-gutters",
     "dbaeumer.vscode-eslint",
     "bierner.markdown-preview-github-styles",
@@ -8,8 +9,16 @@
     "esbenp.prettier-vscode",
     "rebornix.project-snippets",
     "psioniq.psi-header",
-    "vitest.explorer",
-    "deinsoftware.vitest-snippets",
-    "kingwl.vscode-vitest-runner"
+    "mike-co.import-sorter",
+    "pmneo.tsimporter",
+    "mikael.angular-beastcode",
+    "github.copilot-chat",
+    "github.copilot",
+    "pkief.material-icon-theme",
+    "dart-code.dart-code",
+    "luanpotter.dart-import",
+    "mokkapps.jasmine-test-selector",
+    "antfu.vite",
+    "vitest.explorer"
   ]
 }

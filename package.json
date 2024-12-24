@@ -1,33 +1,41 @@
 {
   "name": "rljson",
-  "version": "3.0.4",
-  "main": "dist/rljson.js",
-  "types": "dist/rljson.d.ts",
-  "scripts": {
-    "test": "vitest --run --coverage"
-  },
-  "type": "module",
-  "keywords": [],
-  "author": "Dr. Gabriel Gatzsche",
-  "license": "MIT",
+  "version": "3.0.5",
   "description": "Define and manage relational data structures in JSON",
+  "license": "MIT",
+  "author": "Dr. Gabriel Gatzsche",
+  "main": "dist/rljson.cjs.js",
+  "module": "dist/rljson.es.js",
+  "types": "dist/types/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "scripts": {
+    "build": "vite build && tsc",
+    "prepare": "npm run build",
+    "test": "npx vitest run --coverage"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/inlavigo/rljson-js.git"
+    "url": "git+https://github.com/inlavigo/rljson-js.git"
   },
+  "keywords": [
+    "gg",
+    "json",
+    "relational",
+    "database"
+  ],
   "devDependencies": {
-    "@eslint/js": "^9.15.0",
-    "@types/node": "^22.10.1",
-    "@vitest/coverage-v8": "^2.1.6",
-    "eslint": "^9.15.0",
-    "eslint-plugin-jsdoc": "^50.6.0",
-    "globals": "^15.12.0",
-    "jsdom": "^25.0.1",
-    "prettier": "^3.4.1",
-    "typescript": "^5.7.2",
-    "typescript-eslint": "^8.16.0",
-    "vite-plugin-eslint": "^1.8.1",
-    "vitest": "^2.1.6"
+    "@types/better-sqlite3": "^7.6.12",
+    "@types/node": "^22.10.2",
+    "@vitest/coverage-v8": "^2.1.8",
+    "typescript": "~5.6.2",
+    "vite": "^6.0.3",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^2.1.8",
+    "vitest-dom": "^0.1.1",
+    "vitest-fetch-mock": "^0.4.3"
   },
   "dependencies": {
     "gg-json-hash": "^2.1.5"

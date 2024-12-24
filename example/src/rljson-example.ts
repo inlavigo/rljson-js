@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 // @license
 // Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
 //
@@ -5,7 +7,7 @@
 // found in the LICENSE file in the root of this package.
 
 import { JsonHash } from 'gg-json-hash';
-import { Rljson } from '../src/rljson.js';
+import { Rljson } from 'rljson';
 
 const jh = JsonHash.default;
 
