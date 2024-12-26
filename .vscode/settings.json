@@ -81,6 +81,8 @@
   "testExplorer.codeLens": true,
   "testExplorer.useNativeTesting": true,
 
+  "vitest.debugExclude": ["<node_internals>/**" /*"node_modules/**"*/],
+
   // #############
   // Code Coverage
   // #############
@@ -498,5 +500,6 @@
     "forceToTop": true
   },
   "dart.analyzeAngularTemplates": false,
-  "html.format.enable": true
+  "html.format.enable": true,
+  "typescript.workspaceSymbols.excludeLibrarySymbols": false
 }
