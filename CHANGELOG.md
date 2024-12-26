@@ -1,5 +1,9 @@
 # Changelog
 
+## [4.1.0]
+
+- Add `Rljson.empty()` to create an empty Rljson instance.
+
 ## [4.0.0]
 
 - Breaking change: Rename `get` into `value`

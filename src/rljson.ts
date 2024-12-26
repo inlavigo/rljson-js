@@ -6,7 +6,6 @@
 
 import { JsonHash } from 'gg-json-hash';
 
-
 /// Manages a normalized JSON data structure
 ///
 /// composed of tables '@tableA', '@tableB', etc.
@@ -35,6 +34,12 @@ export class Rljson {
     let result = new Rljson({ originalData: {}, data: {} });
     result = result.addData(data, { validateHashes });
     return result;
+  }
+
+  // ...........................................................................
+  /// Creates an empty Rljson instance
+  static empty(): Rljson {
+    return new Rljson({ originalData: {}, data: {} });
   }
 
   // ...........................................................................

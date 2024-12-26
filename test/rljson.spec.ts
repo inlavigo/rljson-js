@@ -9,7 +9,6 @@ import { beforeEach, expect, suite, test } from 'vitest';
 
 import { Rljson } from '../src/rljson';
 
-
 suite('Rljson', () => {
   let rljson: Rljson;
   let a0Hash: string;
@@ -65,6 +64,14 @@ suite('Rljson', () => {
           },
         },
       });
+    });
+  });
+
+  suite('empty()', () => {
+    test('returns an empty Rljson object', () => {
+      const emptyRljson = Rljson.empty();
+      expect(emptyRljson.data).toEqual({});
+      expect(emptyRljson.originalData).toEqual({});
     });
   });
 
@@ -151,7 +158,7 @@ suite('Rljson', () => {
     });
   });
 
-  suite('get(table, hash, key, key2, key3, key4 followLinks)', () => {
+  suite('value(table, itemHash, followLink)', () => {
     suite('returns', () => {
       test('the value of the key of the item with hash in table', () => {
         expect(
@@ -237,10 +244,25 @@ suite('Rljson', () => {
           'Error: Invalid key "keyA1". Additional keys are only allowed for links. But key "keyA0" points to a value.',
         );
       });
+
+      test('when the item hash is empty', () => {
+        let exception;
+
+        try {
+          rljson.value({
+            table: 'tableA',
+            itemHash: '',
+          });
+        } catch (e: any) {
+          exception = e;
+        }
+
+        expect(exception.toString()).toBe('Error: itemHash must not be empty.');
+      });
     });
   });
 
-  suite('select()', () => {
+  suite('select(table, columns)', () => {
     test('allow to join values from different tables', () => {
       rljson = Rljson.exampleWithDeepLink;
       const hash = Object.keys(rljson.data.a)[0];
@@ -256,6 +278,20 @@ suite('Rljson', () => {
         ['a', 'b', 'c', 'd'],
         ['a0', 'b', 'c', 'd'],
       ]);
+    });
+
+    suite('throws', () => {
+      test('when table is not found', () => {
+        let exception;
+
+        try {
+          rljson.select('tableC', ['keyA0']);
+        } catch (e: any) {
+          exception = e;
+        }
+
+        expect(exception.toString()).toBe('Error: Table "tableC" not found.');
+      });
     });
   });
 
