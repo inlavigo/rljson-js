@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.0.0]
+
+- Breaking change: Rename `get` into `value`
+- Add `select` method to select multiple columns
+
 ## [3.0.0]
 
 - Breaking change: Use Ref postfix instead of @

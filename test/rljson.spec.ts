@@ -9,6 +9,7 @@ import { beforeEach, expect, suite, test } from 'vitest';
 
 import { Rljson } from '../src/rljson';
 
+
 suite('Rljson', () => {
   let rljson: Rljson;
   let a0Hash: string;
@@ -110,10 +111,10 @@ suite('Rljson', () => {
     });
   });
 
-  suite('item(table, hash)', () => {
+  suite('row(table, hash)', () => {
     suite('returns', () => {
       test('the item when existing', () => {
-        const item = rljson.item('tableA', a0Hash);
+        const item = rljson.row('tableA', a0Hash);
         expect(item).toEqual({
           keyA0: 'a0',
           _hash: a0Hash,
@@ -126,7 +127,7 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.item('tableC', a0Hash);
+          rljson.row('tableC', a0Hash);
         } catch (e: any) {
           exception = e;
         }
@@ -138,7 +139,7 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.item('tableA', 'nonExistingHash');
+          rljson.row('tableA', 'nonExistingHash');
         } catch (e: any) {
           exception = e;
         }
@@ -150,20 +151,20 @@ suite('Rljson', () => {
     });
   });
 
-  suite('value(table, hash, key, key2, key3, key4 followLinks)', () => {
+  suite('get(table, hash, key, key2, key3, key4 followLinks)', () => {
     suite('returns', () => {
       test('the value of the key of the item with hash in table', () => {
         expect(
-          rljson.get({
+          rljson.value({
             table: 'tableA',
-            item: a0Hash,
-            key1: 'keyA0',
+            itemHash: a0Hash,
+            followLink: ['keyA0'],
           }),
         ).toBe('a0');
       });
 
       test('the complete item, when no key is given', () => {
-        expect(rljson.get({ table: 'tableA', item: a0Hash })).toEqual({
+        expect(rljson.value({ table: 'tableA', itemHash: a0Hash })).toEqual({
           keyA0: 'a0',
           _hash: a0Hash,
         });
@@ -178,10 +179,10 @@ suite('Rljson', () => {
         });
 
         expect(
-          rljson.get({
+          rljson.value({
             table: 'linkToTableA',
-            item: tableALinkHash,
-            key1: 'tableARef',
+            itemHash: tableALinkHash,
+            followLink: ['tableARef'],
           }),
         ).toEqual({ _hash: a0Hash, keyA0: 'a0' });
       });
@@ -191,13 +192,10 @@ suite('Rljson', () => {
         const hash = Object.keys(rljson.data.a)[0];
 
         expect(
-          rljson.get({
+          rljson.value({
             table: 'a',
-            item: hash,
-            key1: 'bRef',
-            key2: 'cRef',
-            key3: 'dRef',
-            key4: 'value',
+            itemHash: hash,
+            followLink: ['bRef', 'cRef', 'dRef', 'value'],
           }),
         ).toBe('d');
       });
@@ -208,10 +206,10 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.get({
+          rljson.value({
             table: 'tableA',
-            item: a0Hash,
-            key1: 'nonExistingKey',
+            itemHash: a0Hash,
+            followLink: ['nonExistingKey'],
           });
         } catch (e: any) {
           exception = e;
@@ -226,11 +224,10 @@ suite('Rljson', () => {
         let exception;
 
         try {
-          rljson.get({
+          rljson.value({
             table: 'tableA',
-            item: a0Hash,
-            key1: 'keyA0',
-            key2: 'keyA1',
+            itemHash: a0Hash,
+            followLink: ['keyA0', 'keyA1'],
           });
         } catch (e: any) {
           exception = e;
@@ -240,6 +237,25 @@ suite('Rljson', () => {
           'Error: Invalid key "keyA1". Additional keys are only allowed for links. But key "keyA0" points to a value.',
         );
       });
+    });
+  });
+
+  suite('select()', () => {
+    test('allow to join values from different tables', () => {
+      rljson = Rljson.exampleWithDeepLink;
+      const hash = Object.keys(rljson.data.a)[0];
+
+      const result = rljson.select('a', [
+        'value',
+        'bRef/value',
+        'bRef/cRef/value',
+        'bRef/cRef/dRef/value',
+      ]);
+
+      expect(result).toEqual([
+        ['a', 'b', 'c', 'd'],
+        ['a0', 'b', 'c', 'd'],
+      ]);
     });
   });
 

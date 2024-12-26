@@ -27,6 +27,14 @@ preserving the benefits of relational modeling.
 ## Example
 
 ```typescript
+#!/usr/bin/env node
+
+// @license
+// Copyright (c) 2019 - 2024 Dr. Gabriel Gatzsche. All Rights Reserved.
+//
+// Use of this source code is governed by terms that can be
+// found in the LICENSE file in the root of this package.
+
 import { JsonHash } from 'gg-json-hash';
 import { Rljson } from 'rljson';
 
@@ -54,16 +62,16 @@ const hashB1 = db.hash({ table: 'tableB', index: 1 });
 
 // .............................................................
 console.log('The hashcode can be used to access data');
-const a0 = db.get({ table: 'tableA', item: hashA0, key1: 'a' });
+const a0 = db.value('tableA', hashA0, ['a']);
 console.log(a0); // a0
 
-const a1 = db.get({ table: 'tableA', item: hashA1, key1: 'a' });
+const a1 = db.value('tableA', hashA1, ['a']);
 console.log(a1); // a1
 
-const b0 = db.get({ table: 'tableB', item: hashB0, key1: 'b' });
+const b0 = db.value('tableB', hashB0, ['b']);
 console.log(b0); // b0
 
-const b1 = db.get({ table: 'tableB', item: hashB1, key1: 'b' });
+const b1 = db.value('tableB', hashB1, ['b']);
 console.log(b1); // b1
 
 // .............................................................
@@ -116,12 +124,7 @@ const tableBValueHash = db.hash({ table: 'b', index: 0 });
 // .............................................................
 console.log('Join tables when reading values');
 
-const a = db.get({
-  table: 'b',
-  item: tableBValueHash,
-  key1: 'aRef',
-  key2: 'value',
-});
+const a = db.value('b', tableBValueHash, ['aRef', 'value']);
 
 console.log(a); // a
 

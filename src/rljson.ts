@@ -6,43 +6,6 @@
 
 import { JsonHash } from 'gg-json-hash';
 
-interface Rlmap {
-  [key: string]: any;
-  _hash?: string;
-}
-
-interface Rltables {
-  [key: string]: Rlmap;
-  _hash?: any;
-}
-
-interface RljsonConstructorParams {
-  originalData: Rltables;
-  data: Rltables;
-}
-
-interface QueryOptions {
-  table: string;
-  where: (item: Rlmap) => boolean;
-}
-
-interface GetOptions {
-  table: string;
-  item: string;
-  key1?: string;
-  key2?: string;
-  key3?: string;
-  key4?: string;
-}
-
-interface HashOptions {
-  table: string;
-  index: number;
-}
-
-interface FromJsonOptions {
-  validateHashes: boolean;
-}
 
 /// Manages a normalized JSON data structure
 ///
@@ -54,12 +17,14 @@ export class Rljson {
   public data: Rltables;
   private jsonJash = JsonHash.default;
 
+  // ...........................................................................
   /// Creates an instance of Rljson.
   constructor({ originalData, data }: RljsonConstructorParams) {
     this.originalData = originalData;
     this.data = data;
   }
 
+  // ...........................................................................
   /// Creates an Rljson instance from JSON data.
   static fromJson(
     data: Record<string, any>,
@@ -72,6 +37,7 @@ export class Rljson {
     return result;
   }
 
+  // ...........................................................................
   /// Creates a new json containing the given data
   addData(
     addedData: Rltables,
@@ -140,6 +106,7 @@ export class Rljson {
     return new Rljson({ originalData: mergedData, data: mergedMap });
   }
 
+  // ...........................................................................
   /// Returns the table with the given name. Throws when name is not found.
   table(table: string): Rltables {
     const tableData = this.data[table];
@@ -150,15 +117,17 @@ export class Rljson {
     return tableData;
   }
 
-  /// Allows to query data from the json
+  // ...........................................................................
+  /// Allows to query data from a table
   items({ table, where }: QueryOptions): Rlmap[] {
     const tableData = this.table(table);
     const items = Object.values(tableData).filter(where);
     return items;
   }
 
+  // ...........................................................................
   /// Allows to query data from the json
-  item(table: string, hash: string): Rlmap {
+  row(table: string, hash: string): Rlmap {
     // Get table
     const tableData = this.data[table];
     if (tableData == null) {
@@ -174,49 +143,101 @@ export class Rljson {
     return item;
   }
 
+  // ...........................................................................
   /// Queries a value from data. Throws when table or hash is not found.
-  get({ table, item, key1, key2, key3, key4 }: GetOptions): any {
-    // Get item
-    const itemHash = item;
-    const resultItem = this.item(table, itemHash);
 
-    // If no key is given, return the complete item
-    if (key1 == null) {
-      return resultItem;
+  value({ table, itemHash, followLink }: GetValue): any {
+    if (itemHash.length === 0) {
+      throw new Error('itemHash must not be empty.');
     }
 
+    // Get item
+    const row = this.row(table, itemHash);
+
+    // If no followLink is given, return the complete row
+    if (!followLink?.length) {
+      return row;
+    }
+
+    const refKey = followLink[0];
+
     // Get item value
-    const itemValue = resultItem[key1];
-    if (itemValue == null) {
+    const value = row[refKey];
+    if (value == null) {
       throw new Error(
-        `Key "${key1}" not found in item with hash "${itemHash}" in table "${table}"`,
+        `Key "${refKey}" not found in item with hash "${itemHash}" in table "${table}"`,
       );
     }
 
     // Return item value when no link or links are not followed
-    if (!key1.endsWith('Ref')) {
-      if (key2 != null) {
+    if (!refKey.endsWith('Ref')) {
+      const refHash = followLink[1];
+      if (refHash != null) {
         throw new Error(
-          `Invalid key "${key2}". Additional keys are only allowed for links. But key "${key1}" points to a value.`,
+          `Invalid key "${refHash}". Additional keys are only allowed for links. But key "${refKey}" points to a value.`,
         );
       }
 
-      return itemValue;
+      return value;
     }
 
     // Follow links
-    const targetTable = key1.substring(0, key1.length - 3);
-    const targetHash = itemValue;
+    const targetTable = refKey.substring(0, refKey.length - 3);
+    const targetHash = value;
 
-    return this.get({
+    return this.value({
       table: targetTable,
-      item: targetHash,
-      key1: key2,
-      key2: key3,
-      key3: key4,
+      itemHash: targetHash,
+      followLink: followLink.slice(1),
     });
   }
 
+  // ...........................................................................
+  /// Joins multiple tables into one and returns the result
+  ///
+  /// Note: This implementation is not optimized for performance.
+  select(table: string, columns: string[]): Array<Array<any>> {
+    // Get the table
+    const sourceRows = this.originalData[table]?._data;
+    if (!sourceRows) {
+      throw new Error(`Table "${table}" not found.`);
+    }
+
+    // Split columns
+    const columnParts = columns.map((column) => column.split('/'));
+
+    // Iterate all rows of the table
+    const targetRows = new Array(sourceRows.length);
+
+    for (let rowNo = 0; rowNo < sourceRows.length; rowNo++) {
+      const sourceRow = sourceRows[rowNo];
+
+      // Create a target row
+      const targetRow = (targetRows[rowNo] = new Array(columns.length));
+
+      // Iterate all columns
+      for (let colNo = 0; colNo < columnParts.length; colNo++) {
+        const parts = columnParts[colNo];
+        const key = parts[0];
+        if (!key.endsWith('Ref')) {
+          targetRow[colNo] = sourceRow[key];
+          continue;
+        } else {
+          const targetTable = key.substring(0, key.length - 3);
+          const targetHash = sourceRow[key];
+          targetRow[colNo] = this.value({
+            table: targetTable,
+            itemHash: targetHash,
+            followLink: parts.slice(1),
+          });
+        }
+      }
+    }
+
+    return targetRows;
+  }
+
+  // ...........................................................................
   /// Returns the hash of the item at the given index in the table
   hash({ table, index }: HashOptions): string {
     const tableData = this.originalData[table];
@@ -234,6 +255,7 @@ export class Rljson {
     return item['_hash'];
   }
 
+  // ...........................................................................
   /// Returns all paths found in data
   ls(): string[] {
     const result: string[] = [];
@@ -250,6 +272,7 @@ export class Rljson {
     return result;
   }
 
+  // ...........................................................................
   /// Throws if a link is not available
   checkLinks(): void {
     for (const table of Object.keys(this.data)) {
@@ -287,6 +310,7 @@ export class Rljson {
     }
   }
 
+  // ...........................................................................
   /// An example object
   static get example(): Rljson {
     return Rljson.fromJson({
@@ -313,6 +337,7 @@ export class Rljson {
     });
   }
 
+  // ...........................................................................
   /// An example object
   static get exampleWithLink(): Rljson {
     return Rljson.fromJson({
@@ -336,6 +361,7 @@ export class Rljson {
     });
   }
 
+  // ...........................................................................
   /// An example object
   static get exampleWithDeepLink(): Rljson {
     // Create an Rljson instance
@@ -347,6 +373,7 @@ export class Rljson {
         _data: [
           {
             value: 'd',
+            details: 'details about d',
           },
         ],
       },
@@ -393,6 +420,10 @@ export class Rljson {
             bRef: hashB,
             value: 'a',
           },
+          {
+            bRef: hashB,
+            value: 'a0',
+          },
         ],
       },
     });
@@ -400,6 +431,7 @@ export class Rljson {
     return rljson;
   }
 
+  // ...........................................................................
   /// Checks if table names are valid
   static checkTableNames(data: Rltables): void {
     for (const key of Object.keys(data)) {
@@ -408,6 +440,7 @@ export class Rljson {
     }
   }
 
+  // ...........................................................................
   /// Checks if a string is valid table name
   static checkTableName(str: string): void {
     // Table name must only contain letters and numbers.
@@ -432,6 +465,7 @@ export class Rljson {
     }
   }
 
+  // ...........................................................................
   /// Checks if data is valid
   private _checkData(data: Rltables): void {
     const tablesWithMissingData: string[] = [];
@@ -464,6 +498,7 @@ export class Rljson {
     }
   }
 
+  // ...........................................................................
   /// Turns data into a map
   private _toMap(data: Rltables): Record<string, any> {
     const result: Record<string, any> = {};
@@ -486,4 +521,39 @@ export class Rljson {
 
     return result;
   }
+}
+
+export interface Rlmap {
+  [key: string]: any;
+  _hash?: string;
+}
+
+export interface Rltables {
+  [key: string]: Rlmap;
+  _hash?: any;
+}
+
+export interface RljsonConstructorParams {
+  originalData: Rltables;
+  data: Rltables;
+}
+
+export interface QueryOptions {
+  table: string;
+  where: (item: Rlmap) => boolean;
+}
+
+export interface GetValue {
+  table: string;
+  itemHash: string;
+  followLink?: string[];
+}
+
+export interface HashOptions {
+  table: string;
+  index: number;
+}
+
+export interface FromJsonOptions {
+  validateHashes: boolean;
 }

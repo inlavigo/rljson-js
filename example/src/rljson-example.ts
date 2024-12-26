@@ -9,6 +9,7 @@
 import { JsonHash } from 'gg-json-hash';
 import { Rljson } from 'rljson';
 
+
 const jh = JsonHash.default;
 
 // .............................................................
@@ -33,16 +34,16 @@ const hashB1 = db.hash({ table: 'tableB', index: 1 });
 
 // .............................................................
 console.log('The hashcode can be used to access data');
-const a0 = db.get({ table: 'tableA', item: hashA0, key1: 'a' });
+const a0 = db.value({table: 'tableA', itemHash: hashA0, followLink: ['a']});
 console.log(a0); // a0
 
-const a1 = db.get({ table: 'tableA', item: hashA1, key1: 'a' });
+const a1 = db.value({table: 'tableA', itemHash: hashA1, followLink: ['a']});
 console.log(a1); // a1
 
-const b0 = db.get({ table: 'tableB', item: hashB0, key1: 'b' });
+const b0 = db.value({table: 'tableB', itemHash: hashB0, followLink: ['b']});
 console.log(b0); // b0
 
-const b1 = db.get({ table: 'tableB', item: hashB1, key1: 'b' });
+const b1 = db.value({table: 'tableB', itemHash: hashB1, followLink: ['b']});
 console.log(b1); // b1
 
 // .............................................................
@@ -95,12 +96,7 @@ const tableBValueHash = db.hash({ table: 'b', index: 0 });
 // .............................................................
 console.log('Join tables when reading values');
 
-const a = db.get({
-  table: 'b',
-  item: tableBValueHash,
-  key1: 'aRef',
-  key2: 'value',
-});
+const a = db.value({table: 'b', itemHash: tableBValueHash, followLink: ['aRef', 'value']});
 
 console.log(a); // a
 
