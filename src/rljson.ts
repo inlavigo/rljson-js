@@ -14,7 +14,7 @@ import { JsonHash } from 'gg-json-hash';
 export class Rljson {
   public originalData: Rltables;
   public data: Rltables;
-  private jsonJash = JsonHash.default;
+  public jsonJash = JsonHash.default;
 
   // ...........................................................................
   /// Creates an instance of Rljson.
@@ -108,6 +108,16 @@ export class Rljson {
       }
     }
 
+    // Recalc main hashes
+    delete mergedData._hash;
+
+    this.jsonJash.apply(mergedData, {
+      inPlace: true,
+      updateExistingHashes: false,
+      throwIfOnWrongHashes: false,
+    });
+
+    // Return result data
     return new Rljson({ originalData: mergedData, data: mergedMap });
   }
 
@@ -432,6 +442,8 @@ export class Rljson {
         ],
       },
     });
+
+    JsonHash.default.validate(rljson.originalData);
 
     return rljson;
   }

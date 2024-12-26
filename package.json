@@ -1,6 +1,6 @@
 {
   "name": "rljson",
-  "version": "4.1.1",
+  "version": "4.1.2",
   "description": "Define and manage relational data structures in JSON",
   "license": "MIT",
   "author": "Dr. Gabriel Gatzsche",
@@ -44,6 +44,6 @@
     "vitest-fetch-mock": "^0.4.3"
   },
   "dependencies": {
-    "gg-json-hash": "^2.1.5"
+    "gg-json-hash": "^2.1.6"
   }
 }
