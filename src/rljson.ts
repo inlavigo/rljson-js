@@ -4,7 +4,7 @@
 // Use of this source code is governed by terms that can be
 // found in the LICENSE file in the root of this package.
 
-import { JsonHash } from 'gg-json-hash';
+import { ApplyJsonHashConfig, JsonHash } from 'gg-json-hash';
 
 /// Manages a normalized JSON data structure
 ///
@@ -27,12 +27,16 @@ export class Rljson {
   /// Creates an Rljson instance from JSON data.
   static fromJson(
     data: Record<string, any>,
-    options: Partial<FromJsonOptions> = { validateHashes: false },
+    options: Partial<FromJsonOptions> = {
+      validateHashes: false,
+      updateHashes: true,
+    },
   ): Rljson {
     const { validateHashes = false } = options;
+    const { updateHashes = true } = options;
 
     let result = new Rljson({ originalData: {}, data: {} });
-    result = result.addData(data, { validateHashes });
+    result = result.addData(data, { validateHashes, updateHashes });
     return result;
   }
 
@@ -46,9 +50,13 @@ export class Rljson {
   /// Creates a new json containing the given data
   addData(
     addedData: Rltables,
-    options: Partial<FromJsonOptions> = { validateHashes: false },
+    options: Partial<FromJsonOptions> = {
+      validateHashes: false,
+      updateHashes: true,
+    },
   ): Rljson {
     const { validateHashes = false } = options;
+    const { updateHashes = true } = options;
     this._checkData(addedData);
     Rljson.checkTableNames(addedData);
 
@@ -56,7 +64,14 @@ export class Rljson {
       this.jsonJash.validate(addedData);
     }
 
-    addedData = this.jsonJash.apply(addedData);
+    addedData = this.jsonJash.apply(
+      addedData,
+      new ApplyJsonHashConfig(
+        false, // inPlace
+        updateHashes,
+        validateHashes, // throwIfOnWrongHashes
+      ),
+    );
     const addedDataAsMap = this._toMap(addedData);
 
     if (Object.keys(this.originalData).length === 0) {
@@ -573,4 +588,5 @@ export interface HashOptions {
 
 export interface FromJsonOptions {
   validateHashes: boolean;
+  updateHashes: boolean;
 }

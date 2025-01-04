@@ -1,5 +1,10 @@
 # Changelog
 
+## [4.1.5]
+
+- Fix: Hash validation was not executed although validateHashes was true
+- Allow not to update existing hashes when adding json etc.
+
 ## [4.1.0]
 
 - Add `Rljson.empty()` to create an empty Rljson instance.

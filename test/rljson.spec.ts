@@ -40,7 +40,7 @@ suite('Rljson', () => {
     });
   });
 
-  suite('fromData(data)', () => {
+  suite('fromJson(data)', () => {
     test('adds hashes to all fields', () => {
       expect(rljson.data).toEqual({
         tableA: {
@@ -63,6 +63,77 @@ suite('Rljson', () => {
             _hash: b1Hash,
           },
         },
+      });
+    });
+
+    suite('checks the hashes', async () => {
+      const sampleData = Rljson.example.originalData;
+      sampleData['_hash'] = 'wrongHash';
+
+      test('when validateHashes is true', async () => {
+        let message = '';
+        try {
+          Rljson.fromJson(sampleData, { validateHashes: true });
+        } catch (e: any) {
+          message = e.toString();
+        }
+
+        expect(message).toBe(
+          'Error: Hash "wrongHash" is wrong. Should be "p-MpVeEkEshpZqH-tmcuKE".',
+        );
+      });
+
+      test('not when validateHashes is not specified', async () => {
+        let message = '';
+        try {
+          Rljson.fromJson(sampleData);
+        } catch (e: any) {
+          message = e.toString();
+        }
+
+        expect(message).toBe('');
+      });
+
+      test('not when validateHashes is false', async () => {
+        let message = '';
+        try {
+          Rljson.fromJson(sampleData, { validateHashes: false });
+        } catch (e: any) {
+          message = e.toString();
+        }
+
+        expect(message).toBe('');
+      });
+    });
+
+    suite('updates the hashes', () => {
+      const sampleData = Rljson.example.originalData;
+      sampleData._hash = 'wrongHash';
+
+      test('when updateHashes is true', () => {
+        const rljson2 = Rljson.fromJson(sampleData, {
+          updateHashes: true,
+          validateHashes: false,
+        });
+
+        expect(rljson2.originalData._hash).not.toEqual('wrongHash');
+      });
+
+      test('when updateHashes is not specified', () => {
+        const rljson2 = Rljson.fromJson(sampleData, {
+          validateHashes: false,
+        });
+
+        expect(rljson2.originalData._hash).not.toEqual('wrongHash');
+      });
+
+      test('not when updateHashes is false', () => {
+        const rljson2 = Rljson.fromJson(sampleData, {
+          updateHashes: false,
+          validateHashes: false,
+        });
+
+        expect(rljson2.originalData._hash).toEqual('wrongHash');
       });
     });
   });
