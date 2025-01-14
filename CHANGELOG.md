@@ -1,5 +1,13 @@
 # Changelog
 
+## [4.1.8]
+
+- Update gg-json-hash for more reliable hash creation
+
+## [4.1.7]
+
+- Changed build process
+
 ## [4.1.5]
 
 - Fix: Hash validation was not executed although validateHashes was true
