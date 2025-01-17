@@ -67,7 +67,7 @@ suite('Rljson', () => {
     });
 
     suite('checks the hashes', async () => {
-      const sampleData = Rljson.example.originalData;
+      const sampleData = Rljson.example.data;
       sampleData['_hash'] = 'wrongHash';
 
       test('when validateHashes is true', async () => {
@@ -107,7 +107,7 @@ suite('Rljson', () => {
     });
 
     suite('updates the hashes', () => {
-      const sampleData = Rljson.example.originalData;
+      const sampleData = Rljson.example.data;
       sampleData._hash = 'wrongHash';
 
       test('when updateHashes is true', () => {
@@ -116,7 +116,7 @@ suite('Rljson', () => {
           validateHashes: false,
         });
 
-        expect(rljson2.originalData._hash).not.toEqual('wrongHash');
+        expect(rljson2.data._hash).not.toEqual('wrongHash');
       });
 
       test('when updateHashes is not specified', () => {
@@ -124,7 +124,7 @@ suite('Rljson', () => {
           validateHashes: false,
         });
 
-        expect(rljson2.originalData._hash).not.toEqual('wrongHash');
+        expect(rljson2.data._hash).not.toEqual('wrongHash');
       });
 
       test('not when updateHashes is false', () => {
@@ -133,7 +133,7 @@ suite('Rljson', () => {
           validateHashes: false,
         });
 
-        expect(rljson2.originalData._hash).toEqual('wrongHash');
+        expect(rljson2.data._hash).toEqual('wrongHash');
       });
     });
   });
@@ -142,7 +142,7 @@ suite('Rljson', () => {
     test('returns an empty Rljson object', () => {
       const emptyRljson = Rljson.empty();
       expect(emptyRljson.indexedData).toEqual({});
-      expect(emptyRljson.originalData).toEqual({});
+      expect(emptyRljson.data).toEqual({});
     });
   });
 
@@ -433,9 +433,9 @@ suite('Rljson', () => {
         },
       });
 
-      const hashA2 = rljson2.originalData.tableA._data[2]._hash;
+      const hashA2 = rljson2.data.tableA._data[2]._hash;
 
-      const items = rljson2.originalData.tableA._data;
+      const items = rljson2.data.tableA._data;
       expect(items).toEqual([
         { keyA0: 'a0', _hash: a0Hash },
         { keyA1: 'a1', _hash: a1Hash },
@@ -467,7 +467,7 @@ suite('Rljson', () => {
         },
       });
 
-      const items = rljson2.originalData.tableA._data;
+      const items = rljson2.data.tableA._data;
       expect(items).toEqual([
         { keyA0: 'a0', _hash: a0Hash },
         { keyA1: 'a1', _hash: a1Hash },

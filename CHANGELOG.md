@@ -3,7 +3,8 @@
 ## [5.0.0]
 
 - BREAKING CHANGES:
-  - `data` is renamed into `indexedData`.
+  - Rename `data` into `indexedData`.
+  - Rename `originalData` into `data`
 
 ## [4.1.8]
 

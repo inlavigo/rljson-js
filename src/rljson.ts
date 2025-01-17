@@ -12,17 +12,14 @@ import { ApplyJsonHashConfig, JsonHash } from 'gg-json-hash';
 /// Each table contains an _data array, which contains data items.
 /// Each data item has an hash calculated using gg_json_hash.
 export class Rljson {
-  public originalData: Rltables;
+  public data: Rltables;
   public indexedData: Rltables;
   public jsonJash = JsonHash.default;
 
   // ...........................................................................
   /// Creates an instance of Rljson.
-  constructor({
-    originalData,
-    indexedData: indexedDate,
-  }: RljsonConstructorParams) {
-    this.originalData = originalData;
+  constructor({ data, indexedData: indexedDate }: RljsonConstructorParams) {
+    this.data = data;
     this.indexedData = indexedDate;
   }
 
@@ -38,7 +35,7 @@ export class Rljson {
     const { validateHashes = false } = options;
     const { updateHashes = true } = options;
 
-    let result = new Rljson({ originalData: {}, indexedData: {} });
+    let result = new Rljson({ data: {}, indexedData: {} });
     result = result.addData(data, { validateHashes, updateHashes });
     return result;
   }
@@ -46,7 +43,7 @@ export class Rljson {
   // ...........................................................................
   /// Creates an empty Rljson instance
   static empty(): Rljson {
-    return new Rljson({ originalData: {}, indexedData: {} });
+    return new Rljson({ data: {}, indexedData: {} });
   }
 
   // ...........................................................................
@@ -77,23 +74,23 @@ export class Rljson {
     );
     const addedDataAsMap = this._toMap(addedData);
 
-    if (Object.keys(this.originalData).length === 0) {
+    if (Object.keys(this.data).length === 0) {
       return new Rljson({
-        originalData: addedData,
+        data: addedData,
         indexedData: addedDataAsMap,
       });
     }
 
-    const mergedData = { ...this.originalData };
+    const mergedData = { ...this.data };
     const mergedMap = { ...this.indexedData };
 
-    if (Object.keys(this.originalData).length > 0) {
+    if (Object.keys(this.data).length > 0) {
       for (const table of Object.keys(addedData)) {
         if (table === '_hash') {
           continue;
         }
 
-        const oldTable = this.originalData[table];
+        const oldTable = this.data[table];
         const newTable = addedData[table];
 
         // Table does not exist yet. Insert all
@@ -136,7 +133,7 @@ export class Rljson {
     });
 
     // Return result data
-    return new Rljson({ originalData: mergedData, indexedData: mergedMap });
+    return new Rljson({ data: mergedData, indexedData: mergedMap });
   }
 
   // ...........................................................................
@@ -231,7 +228,7 @@ export class Rljson {
   /// Note: This implementation is not optimized for performance.
   select(table: string, columns: string[]): Array<Array<any>> {
     // Get the table
-    const sourceRows = this.originalData[table]?._data;
+    const sourceRows = this.data[table]?._data;
     if (!sourceRows) {
       throw new Error(`Table "${table}" not found.`);
     }
@@ -273,7 +270,7 @@ export class Rljson {
   // ...........................................................................
   /// Returns the hash of the item at the given index in the table
   hash({ table, index }: HashOptions): string {
-    const tableData = this.originalData[table];
+    const tableData = this.data[table];
 
     if (tableData == null) {
       throw new Error(`Table "${table}" not found.`);
@@ -461,7 +458,7 @@ export class Rljson {
       },
     });
 
-    JsonHash.default.validate(rljson.originalData);
+    JsonHash.default.validate(rljson.data);
 
     return rljson;
   }
@@ -569,7 +566,7 @@ export interface Rltables {
 }
 
 export interface RljsonConstructorParams {
-  originalData: Rltables;
+  data: Rltables;
   indexedData: Rltables;
 }
 
