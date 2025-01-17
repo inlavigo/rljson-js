@@ -42,7 +42,7 @@ suite('Rljson', () => {
 
   suite('fromJson(data)', () => {
     test('adds hashes to all fields', () => {
-      expect(rljson.indexedData).toEqual({
+      expect(rljson.dataIndexed).toEqual({
         tableA: {
           [a0Hash]: {
             keyA0: 'a0',
@@ -141,7 +141,7 @@ suite('Rljson', () => {
   suite('empty()', () => {
     test('returns an empty Rljson object', () => {
       const emptyRljson = Rljson.empty();
-      expect(emptyRljson.indexedData).toEqual({});
+      expect(emptyRljson.dataIndexed).toEqual({});
       expect(emptyRljson.data).toEqual({});
     });
   });
@@ -267,7 +267,7 @@ suite('Rljson', () => {
 
       test('the linked value across multiple tables using key2 to key4', () => {
         rljson = Rljson.exampleWithDeepLink;
-        const hash = Object.keys(rljson.indexedData.a)[0];
+        const hash = Object.keys(rljson.dataIndexed.a)[0];
 
         expect(
           rljson.value({
@@ -336,7 +336,7 @@ suite('Rljson', () => {
   suite('select(table, columns)', () => {
     test('allow to join values from different tables', () => {
       rljson = Rljson.exampleWithDeepLink;
-      const hash = Object.keys(rljson.indexedData.a)[0];
+      const hash = Object.keys(rljson.dataIndexed.a)[0];
 
       const result = rljson.select('a', [
         'value',
@@ -546,7 +546,7 @@ suite('Rljson', () => {
   suite('data', () => {
     suite('returns the data where the _data list is replaced by a map', () => {
       test('with example', () => {
-        expect(rljson.indexedData).toEqual({
+        expect(rljson.dataIndexed).toEqual({
           tableA: {
             [a0Hash]: {
               keyA0: 'a0',
@@ -577,7 +577,7 @@ suite('Rljson', () => {
           },
         });
 
-        expect(rljson2.indexedData).toEqual({
+        expect(rljson2.dataIndexed).toEqual({
           tableA: {
             [a0Hash]: {
               keyA0: 'a0',
