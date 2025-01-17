@@ -146,10 +146,10 @@ suite('Rljson', () => {
     });
   });
 
-  suite('table(String table)', () => {
+  suite('tableIndexed(table)', () => {
     suite('returns', () => {
       test('the table when existing', () => {
-        const table = rljson.table('tableA');
+        const table = rljson.tableIndexed('tableA');
         expect(table).toEqual({
           [a0Hash]: {
             keyA0: 'a0',
@@ -168,12 +168,69 @@ suite('Rljson', () => {
         let exception;
 
         try {
+          rljson.tableIndexed('tableC');
+        } catch (e: any) {
+          exception = e;
+        }
+
+        expect(exception.toString()).toBe('Error: Table not found: tableC');
+      });
+    });
+  });
+
+  suite('table(table)', () => {
+    suite('returns', () => {
+      test('the table when existing', () => {
+        const table = rljson.table('tableA');
+        expect(table).toEqual({
+          _data: [
+            {
+              _hash: 'KFQrf4mEz0UPmUaFHwH4T6',
+              keyA0: 'a0',
+            },
+            {
+              _hash: 'YPw-pxhqaUOWRFGramr4B1',
+              keyA1: 'a1',
+            },
+          ],
+          _hash: '8RUw1ThatGN9UsgFQ0xSfS',
+        });
+      });
+    });
+
+    suite('throws', () => {
+      test('when table does not exist', () => {
+        let exception;
+
+        try {
           rljson.table('tableC');
         } catch (e: any) {
           exception = e;
         }
 
         expect(exception.toString()).toBe('Error: Table not found: tableC');
+      });
+    });
+  });
+
+  suite('hasTable(String table)', () => {
+    suite('returns', () => {
+      test('true when table exists', () => {
+        expect(rljson.hasTable('tableA')).toBe(true);
+      });
+
+      test('false when table does not exist', () => {
+        expect(rljson.hasTable('tableX')).toBe(false);
+      });
+    });
+  });
+
+  suite('createTable(String table)', () => {
+    suite('with inPlace true', () => {
+      test('modifies the original object', () => {
+        const rljson2 = rljson.createTable('tableX');
+        expect(rljson.hasTable('tableX')).toBe(true);
+        expect(rljson2).toBe(rljson);
       });
     });
   });
@@ -226,6 +283,30 @@ suite('Rljson', () => {
           'Error: Item not found with hash "nonExistingHash" in table "tableA"',
         );
       });
+    });
+  });
+
+  suite('addRow(table, item)', () => {
+    const inPlace = true;
+
+    test('does nothing when the item is already in the table', () => {
+      const item = rljson.data.tableA._data[0];
+      rljson.addRow('tableA', item);
+    });
+
+    test('modifies the original object', () => {
+      rljson.addRow('tableA', { keyA2: 'a2' });
+      const hashA2 = rljson.hash({ table: 'tableA', index: 2 });
+      const items = rljson.data.tableA._data;
+      const tableIndexed = rljson.tableIndexed('tableA');
+      const item = tableIndexed[hashA2];
+      expect(item.keyA2).toBe('a2');
+
+      expect(items).toEqual([
+        { keyA0: 'a0', _hash: a0Hash },
+        { keyA1: 'a1', _hash: a1Hash },
+        { keyA2: 'a2', _hash: hashA2 },
+      ]);
     });
   });
 
@@ -472,6 +553,22 @@ suite('Rljson', () => {
         { keyA0: 'a0', _hash: a0Hash },
         { keyA1: 'a1', _hash: a1Hash },
       ]);
+    });
+
+    suite('with inPlace', () => {
+      suite('true', () => {
+        test('modifies the original object', () => {
+          const rljson2 = rljson.addData({
+            tableX: {
+              _data: [{ keyA2: 'a2' }],
+            },
+          });
+
+          rljson2.hasTable('tableX');
+          rljson2.hasTable('tableX');
+          expect(rljson2).toBe(rljson);
+        });
+      });
     });
   });
 

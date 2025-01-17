@@ -50,13 +50,13 @@ export class Rljson {
   /// Creates a new json containing the given data
   addData(
     addedData: Rltables,
-    options: Partial<FromJsonOptions> = {
+    options: Partial<AddDataOptions> = {
       validateHashes: false,
       updateHashes: true,
     },
   ): Rljson {
-    const { validateHashes = false } = options;
-    const { updateHashes = true } = options;
+    const { validateHashes = false, updateHashes = true } = options;
+
     this._checkData(addedData);
     Rljson.checkTableNames(addedData);
 
@@ -67,7 +67,7 @@ export class Rljson {
     addedData = this.jsonJash.apply(
       addedData,
       new ApplyJsonHashConfig(
-        false, // inPlace
+        false,
         updateHashes,
         validateHashes, // throwIfOnWrongHashes
       ),
@@ -127,18 +127,20 @@ export class Rljson {
     delete mergedData._hash;
 
     this.jsonJash.apply(mergedData, {
-      inPlace: true,
       updateExistingHashes: false,
       throwIfOnWrongHashes: false,
+      inPlace: true,
     });
 
-    // Return result data
-    return new Rljson({ data: mergedData, dataIndexed: mergedDataIndexed });
+    // Replace own data
+    this.data = mergedData;
+    this.dataIndexed = mergedDataIndexed;
+    return this;
   }
 
   // ...........................................................................
   /// Returns the table with the given name. Throws when name is not found.
-  table(table: string): Rltables {
+  tableIndexed(table: string): Rltables {
     const tableData = this.dataIndexed[table];
     if (tableData == null) {
       throw new Error(`Table not found: ${table}`);
@@ -148,9 +150,36 @@ export class Rljson {
   }
 
   // ...........................................................................
+  /// Returns the table with the given name. Throws when name is not found.
+  table(table: string): Rltables {
+    const tableData = this.data[table];
+
+    if (tableData == null) {
+      throw new Error(`Table not found: ${table}`);
+    }
+
+    return tableData;
+  }
+
+  // ...........................................................................
+  hasTable(table: string): boolean {
+    return this.dataIndexed[table] != null;
+  }
+
+  // ...........................................................................
+  /// Adds a new table to the data
+  createTable(table: string): Rljson {
+    return this.addData({
+      [table]: {
+        _data: [],
+      },
+    });
+  }
+
+  // ...........................................................................
   /// Allows to query data from a table
   items({ table, where }: QueryOptions): Rlmap[] {
-    const tableData = this.table(table);
+    const tableData = this.tableIndexed(table);
     const items = Object.values(tableData).filter(where);
     return items;
   }
@@ -171,6 +200,33 @@ export class Rljson {
     }
 
     return item;
+  }
+
+  // ...........................................................................
+  addRow(table: string, item: Rlmap): void {
+    // Add or validate hashes
+    item = this.jsonJash.apply(
+      item,
+      new ApplyJsonHashConfig(
+        false, // inPlace
+        false, // updateExistingHashes
+        true, // throwIfOnWrongHashes
+      ),
+    );
+
+    // Get the right tables
+    let tableData = this.table(table);
+    let tableDataIndexed = this.dataIndexed[table];
+
+    // Do nothing when the item already exists
+    const itemExitsts = tableDataIndexed[item._hash!] != null;
+    if (itemExitsts) {
+      return;
+    }
+
+    // Write the item into the tables
+    tableData['_data'].push(item);
+    tableDataIndexed[item._hash!] = item;
   }
 
   // ...........................................................................
@@ -587,6 +643,11 @@ export interface HashOptions {
 }
 
 export interface FromJsonOptions {
+  validateHashes: boolean;
+  updateHashes: boolean;
+}
+
+export interface AddDataOptions {
   validateHashes: boolean;
   updateHashes: boolean;
 }

@@ -5,6 +5,11 @@
 - BREAKING CHANGES:
   - Rename `data` into `dataIndexed`.
   - Rename `originalData` into `data`
+  - Remove `inPlace` option. All changes are in-place now.
+- Add `hasTable`
+- Add `inPlace` option to `addData`
+- Add `addTable`
+- Add `createTable`
 
 ## [4.1.8]
 
