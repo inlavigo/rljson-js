@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.0.0]
+
+- BREAKING CHANGES:
+  - `data` is renamed into `indexedData`.
+
 ## [4.1.8]
 
 - Update gg-json-hash for more reliable hash creation

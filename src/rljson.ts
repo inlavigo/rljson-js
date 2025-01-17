@@ -13,14 +13,17 @@ import { ApplyJsonHashConfig, JsonHash } from 'gg-json-hash';
 /// Each data item has an hash calculated using gg_json_hash.
 export class Rljson {
   public originalData: Rltables;
-  public data: Rltables;
+  public indexedData: Rltables;
   public jsonJash = JsonHash.default;
 
   // ...........................................................................
   /// Creates an instance of Rljson.
-  constructor({ originalData, data }: RljsonConstructorParams) {
+  constructor({
+    originalData,
+    indexedData: indexedDate,
+  }: RljsonConstructorParams) {
     this.originalData = originalData;
-    this.data = data;
+    this.indexedData = indexedDate;
   }
 
   // ...........................................................................
@@ -35,7 +38,7 @@ export class Rljson {
     const { validateHashes = false } = options;
     const { updateHashes = true } = options;
 
-    let result = new Rljson({ originalData: {}, data: {} });
+    let result = new Rljson({ originalData: {}, indexedData: {} });
     result = result.addData(data, { validateHashes, updateHashes });
     return result;
   }
@@ -43,7 +46,7 @@ export class Rljson {
   // ...........................................................................
   /// Creates an empty Rljson instance
   static empty(): Rljson {
-    return new Rljson({ originalData: {}, data: {} });
+    return new Rljson({ originalData: {}, indexedData: {} });
   }
 
   // ...........................................................................
@@ -77,12 +80,12 @@ export class Rljson {
     if (Object.keys(this.originalData).length === 0) {
       return new Rljson({
         originalData: addedData,
-        data: addedDataAsMap,
+        indexedData: addedDataAsMap,
       });
     }
 
     const mergedData = { ...this.originalData };
-    const mergedMap = { ...this.data };
+    const mergedMap = { ...this.indexedData };
 
     if (Object.keys(this.originalData).length > 0) {
       for (const table of Object.keys(addedData)) {
@@ -100,7 +103,7 @@ export class Rljson {
           continue;
         }
 
-        const oldMap = this.data[table];
+        const oldMap = this.indexedData[table];
 
         // Table exists. Merge data
         const mergedTableData = [...oldTable['_data']];
@@ -133,13 +136,13 @@ export class Rljson {
     });
 
     // Return result data
-    return new Rljson({ originalData: mergedData, data: mergedMap });
+    return new Rljson({ originalData: mergedData, indexedData: mergedMap });
   }
 
   // ...........................................................................
   /// Returns the table with the given name. Throws when name is not found.
   table(table: string): Rltables {
-    const tableData = this.data[table];
+    const tableData = this.indexedData[table];
     if (tableData == null) {
       throw new Error(`Table not found: ${table}`);
     }
@@ -159,7 +162,7 @@ export class Rljson {
   /// Allows to query data from the json
   row(table: string, hash: string): Rlmap {
     // Get table
-    const tableData = this.data[table];
+    const tableData = this.indexedData[table];
     if (tableData == null) {
       throw new Error(`Table not found: ${table}`);
     }
@@ -289,7 +292,7 @@ export class Rljson {
   /// Returns all paths found in data
   ls(): string[] {
     const result: string[] = [];
-    for (const [table, tableData] of Object.entries(this.data)) {
+    for (const [table, tableData] of Object.entries(this.indexedData)) {
       for (const [hash, item] of Object.entries(tableData)) {
         for (const key of Object.keys(item)) {
           if (key === '_hash') {
@@ -305,8 +308,8 @@ export class Rljson {
   // ...........................................................................
   /// Throws if a link is not available
   checkLinks(): void {
-    for (const table of Object.keys(this.data)) {
-      const tableData = this.data[table];
+    for (const table of Object.keys(this.indexedData)) {
+      const tableData = this.indexedData[table];
 
       for (const entry of Object.entries(tableData)) {
         const item = entry[1];
@@ -316,7 +319,7 @@ export class Rljson {
           if (key.endsWith('Ref')) {
             // Check if linked table exists
             const tableName = key.substring(0, key.length - 3);
-            const linkTable = this.data[tableName];
+            const linkTable = this.indexedData[tableName];
             const hash = item['_hash'];
 
             if (linkTable == null) {
@@ -567,7 +570,7 @@ export interface Rltables {
 
 export interface RljsonConstructorParams {
   originalData: Rltables;
-  data: Rltables;
+  indexedData: Rltables;
 }
 
 export interface QueryOptions {
