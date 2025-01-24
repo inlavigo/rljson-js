@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.0.2]
+
+- Update to latest version of gg-json-hash
+
 ## [5.0.0]
 
 - BREAKING CHANGES:
