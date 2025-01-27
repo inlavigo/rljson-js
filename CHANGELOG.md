@@ -1,5 +1,10 @@
 # Changelog
 
+## [5.0.3]
+
+- Update to latest version of gg-json-hash
+- Fix: Broken, when Rljson contains `null`
+
 ## [5.0.2]
 
 - Update to latest version of gg-json-hash

@@ -1,6 +1,6 @@
 {
   "name": "rljson",
-  "version": "5.0.2",
+  "version": "5.0.3",
   "description": "Define and manage relational data structures in JSON",
   "license": "MIT",
   "author": "Dr. Gabriel Gatzsche",
@@ -43,6 +43,6 @@
     "vite-plugin-dts": "^4.4.0"
   },
   "peerDependencies": {
-    "gg-json-hash": "^3.2.0"
+    "gg-json-hash": "^3.2.1"
   }
 }
