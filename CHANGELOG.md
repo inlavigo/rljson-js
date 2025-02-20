@@ -1,5 +1,13 @@
 # Changelog
 
+## [5.0.5]
+
+- Update dependencies
+
+## [5.0.4]
+
+- Update rljson
+
 ## [5.0.3]
 
 - Update to latest version of gg-json-hash

@@ -1,6 +1,6 @@
 {
   "name": "rljson",
-  "version": "5.0.3",
+  "version": "5.0.5",
   "description": "Define and manage relational data structures in JSON",
   "license": "MIT",
   "author": "Dr. Gabriel Gatzsche",
@@ -32,17 +32,17 @@
   ],
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.12",
-    "@types/node": "^22.10.2",
-    "@vitest/coverage-v8": "^2.1.8",
-    "typescript": "~5.6.2",
-    "vite": "^6.0.3",
+    "@types/node": "^22.13.4",
+    "@vitest/coverage-v8": "^3.0.6",
+    "typescript": "~5.7.3",
+    "vite": "^6.1.1",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^2.1.8",
+    "vitest": "^3.0.6",
     "vitest-dom": "^0.1.1",
     "vitest-fetch-mock": "^0.4.3",
     "vite-plugin-dts": "^4.4.0"
   },
   "peerDependencies": {
-    "gg-json-hash": "^3.2.1"
+    "gg-json-hash": "^3.3.0"
   }
 }
