@@ -1,5 +1,9 @@
 # Changelog
 
+## [5.0.6]
+
+- Update gg-json-hash switching base64 and sha256 algorithm
+
 ## [5.0.5]
 
 - Update dependencies
